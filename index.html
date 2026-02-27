@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FF6B00">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Asan Tiffin">
+<meta name="description" content="Asan Tiffin Service — Daily tiffin delivery management app">
+<meta name="application-name" content="Asan Tiffin">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Asan Tiffin Service</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--saffron:#FF6B00;--cream:#FFF8F0;--dark:#1A0A00;--green:#2D7A3A;--lgreen:#E8F5EB;--blue:#1A6EFF;--lblue:#EEF4FF;--shadow:0 8px 32px rgba(255,107,0,0.1);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{height:100%;overflow:hidden;}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--dark);height:100%;overflow:hidden;position:fixed;width:100%;}
+#appShell{height:100%;display:flex;flex-direction:column;overflow:hidden;}
+#pageArea{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom);}
+
+
+/* NAV — bottom tab bar like native app */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:white;display:flex;border-top:1px solid #F0EAE2;box-shadow:0 -4px 20px rgba(0,0,0,0.08);padding-bottom:env(safe-area-inset-bottom);overflow-x:auto;}
+.nt{flex:0 0 auto;min-width:60px;padding:8px 6px 6px;text-align:center;font-size:9px;font-weight:700;color:#bbb;cursor:pointer;border-top:2px solid transparent;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.nt .ti{font-size:20px;transition:transform 0.2s;}
+.nt.active{color:var(--saffron);border-top-color:var(--saffron);}
+.nt.active .ti{transform:translateY(-2px);}
+.page{display:none;}.page.active{display:block;}
+.sec{padding:16px 14px 100px;max-width:520px;margin:0 auto;}
+.stitle{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:3px;}
+.ssub{font-size:12px;color:#999;margin-bottom:14px;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#FF6B00 0%,#FF8C00 40%,#FFB347 100%);padding:36px 18px 54px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:rgba(255,255,255,0.08);border-radius:50%;}
+.hero::after{content:'';position:absolute;bottom:-80px;left:-40px;width:260px;height:260px;background:rgba(255,255,255,0.06);border-radius:50%;}
+.brand{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:7px 18px;margin-bottom:20px;}
+.brand-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:white;letter-spacing:1px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(24px,6.5vw,44px);font-weight:900;color:white;line-height:1.2;margin-bottom:10px;}
+.hero p{font-size:14px;color:rgba(255,255,255,0.9);margin-bottom:22px;max-width:380px;margin-left:auto;margin-right:auto;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:white;color:var(--saffron);font-weight:700;font-size:13px;padding:9px 20px;border-radius:50px;box-shadow:0 4px 14px rgba(0,0,0,0.13);}
+
+/* PLAN CARDS */
+.mc{background:white;border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px;border:2px solid transparent;position:relative;overflow:hidden;}
+.mc.pop{border-color:var(--saffron);}
+.ptag{position:absolute;top:12px;right:12px;background:var(--saffron);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;}
+.ph{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.pi{width:45px;height:45px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.pi.g{background:#FFF3DC}.pi.o{background:#FFE8D6}.pi.gr{background:var(--lgreen)}
+.pname{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.pp{font-size:23px;font-weight:900;color:var(--saffron);line-height:1;}
+.pp span{font-size:11px;font-weight:600;color:#999;}
+.div{height:1px;background:#F0EAE2;margin:10px 0;}
+.mi{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.mit{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#444;}
+.mii{width:27px;height:27px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+
+/* CARD BOX */
+.card{background:white;border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:11px;}
+.fi{text-align:center;padding:12px 7px;background:var(--cream);border-radius:12px;}
+.fem{font-size:23px;margin-bottom:4px;}
+.flbl{font-size:11px;font-weight:700;}
+.fdesc{font-size:9px;color:#999;margin-top:1px;}
+
+/* BUTTONS */
+.btn{width:100%;padding:12px;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-p{background:linear-gradient(135deg,#FF6B00,#FF8C00);color:white;box-shadow:0 4px 12px rgba(255,107,0,0.3);}
+.btn-p:hover{transform:translateY(-2px);}
+.btn-o{background:transparent;color:var(--saffron);border:2px solid var(--saffron);}
+.btn-o:hover{background:#FFF3EC;}
+.btn-g{background:linear-gradient(135deg,#2D7A3A,#3BA84D);color:white;box-shadow:0 4px 12px rgba(45,122,58,0.25);}
+.btn-g:hover{transform:translateY(-2px);}
+.btn-b{background:linear-gradient(135deg,#1A6EFF,#0050CC);color:white;box-shadow:0 4px 12px rgba(26,110,255,0.25);}
+.btn-b:hover{transform:translateY(-2px);}
+.btn-sm{padding:7px 14px;width:auto;font-size:11px;border-radius:9px;}
+
+/* FORM */
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:#666;margin-bottom:4px;}
+.fg input,.fg select,.fg textarea{width:100%;border:2px solid #EDE8E2;border-radius:10px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--dark);background:var(--cream);outline:none;transition:border-color 0.2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--saffron);}
+.fg textarea{resize:none;height:70px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* SUMMARY BAR */
+.psum{background:var(--cream);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.prow{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.prow:last-child{margin-bottom:0;border-top:1px solid #E8DDD2;padding-top:6px;}
+.prow .l{color:#888;}.prow .v{font-weight:700;}
+.prow.tot .l{font-size:13px;font-weight:800;color:var(--dark);}
+.prow.tot .v{font-size:16px;color:var(--saffron);}
+
+/* PAYMENT METHOD */
+.pm{display:flex;align-items:center;gap:12px;border:2px solid #F0EAE2;border-radius:12px;padding:12px 13px;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
+.pm:hover{border-color:var(--saffron);background:#FFFAF6;}
+.pm.sel{border-color:var(--saffron);background:#FFF3EC;}
+.pmico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.pminfo{flex:1;}.pmname{font-size:13px;font-weight:700;}.pmdesc{font-size:10px;color:#999;}
+.prad{width:18px;height:18px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.prad.sel{border-color:var(--saffron);}
+.prad.sel::after{content:'';width:8px;height:8px;background:var(--saffron);border-radius:50%;}
+
+/* TRACKING */
+.track-top{background:linear-gradient(135deg,#1A6EFF,#0050CC);border-radius:18px;padding:18px;color:white;margin-bottom:16px;box-shadow:0 8px 24px rgba(26,110,255,0.25);}
+.t-eta{font-size:28px;font-weight:900;margin:6px 0;}
+.t-eta span{font-size:12px;font-weight:600;opacity:0.8;}
+.t-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.2);padding:3px 11px;border-radius:20px;font-size:10px;font-weight:700;}
+.pd{width:6px;height:6px;background:#4AFF6B;border-radius:50%;animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+.mapbox{background:linear-gradient(135deg,#e8f0fe,#d1e3ff);border-radius:16px;height:120px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;border:2px dashed #A0BEFD;position:relative;overflow:hidden;}
+.mroad{position:absolute;bottom:26px;left:0;right:0;height:16px;background:rgba(255,255,255,0.35);}
+.mbike{font-size:24px;position:absolute;bottom:26px;animation:bm 3s ease-in-out infinite alternate;}
+@keyframes bm{from{left:20%}to{left:65%}}
+.mlabel{font-size:10px;font-weight:700;color:var(--blue);position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;}
+.steps{background:white;border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px;}
+.srow{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;position:relative;}
+.srow:last-child{margin-bottom:0;}
+.sline{position:absolute;left:17px;top:36px;width:2px;background:#F0EAE2;height:calc(100% + 2px);}
+.srow:last-child .sline{display:none;}
+.sdot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;position:relative;z-index:1;}
+.sdot.done{background:var(--lgreen);}
+.sdot.active{background:#FFF3DC;animation:sp 1.5s infinite;}
+@keyframes sp{0%,100%{box-shadow:0 0 0 4px rgba(255,107,0,0.12)}50%{box-shadow:0 0 0 7px rgba(255,107,0,0.06)}}
+.sdot.pend{background:#F5F5F5;filter:grayscale(1);opacity:0.4;}
+.sinfo{flex:1;padding-top:4px;}
+.stit{font-size:12px;font-weight:700;}.stit.pend{color:#bbb;}
+.stm{font-size:10px;color:#999;margin-top:1px;}.stm.act{color:var(--saffron);font-weight:700;}
+.oid-bar{background:white;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);margin-bottom:14px;}
+.oid-lbl{font-size:10px;color:#999;}.oid-val{font-size:13px;font-weight:800;}
+.copy-btn{font-size:10px;font-weight:700;color:var(--saffron);background:#FFF3EC;border:none;padding:4px 10px;border-radius:7px;cursor:pointer;}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:flex-end;}
+.overlay.active{display:flex;}
+.modal{background:white;width:100%;max-width:520px;margin:0 auto;border-radius:22px 22px 0 0;padding:20px 16px 32px;animation:su 0.3s ease;max-height:92vh;overflow-y:auto;position:relative;}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:#E0D9D0;border-radius:4px;margin:0 auto 14px;}
+.modal h2{font-family:'Playfair Display',serif;font-size:19px;margin-bottom:2px;}
+.msub{font-size:11px;color:#999;margin-bottom:16px;}
+.cbtn{position:absolute;top:14px;right:14px;width:30px;height:30px;background:var(--cream);border:none;border-radius:50%;font-size:14px;cursor:pointer;}
+.proc{display:none;text-align:center;padding:40px 16px;}
+.proc.active{display:block;}
+.spin{width:44px;height:44px;border:4px solid #F0EAE2;border-top-color:var(--saffron);border-radius:50%;animation:sp2 0.8s linear infinite;margin:0 auto 14px;}
+@keyframes sp2{to{transform:rotate(360deg)}}
+.succ{display:none;text-align:center;padding:24px 12px 6px;}
+.succ.active{display:block;}
+.succ-ico{font-size:56px;margin-bottom:12px;animation:bi 0.5s ease;}
+@keyframes bi{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.succ h2{font-family:'Playfair Display',serif;font-size:21px;margin-bottom:6px;color:var(--green);}
+.succ p{color:#777;font-size:12px;line-height:1.6;}
+.oid-chip{display:inline-block;background:var(--cream);border-radius:9px;padding:6px 16px;font-weight:800;font-size:14px;color:var(--saffron);margin:10px 0;}
+
+/* ===================== CUSTOMER RECORDS ===================== */
+.cr-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.cr-search{display:flex;align-items:center;gap:8px;background:white;border:2px solid #EDE8E2;border-radius:11px;padding:9px 13px;margin-bottom:14px;}
+.cr-search input{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;outline:none;flex:1;color:var(--dark);}
+.cr-search input::placeholder{color:#bbb;}
+
+.customer-card{background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+.customer-card:hover{border-color:var(--saffron);transform:translateY(-1px);}
+.customer-card.selected-card{border-color:var(--saffron);background:#FFFAF6;}
+.cust-row{display:flex;align-items:center;gap:12px;}
+.cust-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;flex-shrink:0;}
+.cust-info{flex:1;min-width:0;}
+.cust-name{font-size:14px;font-weight:800;color:var(--dark);}
+.cust-phone{font-size:11px;color:#888;}
+.cust-plan-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+.plan-premium{background:#FFF3DC;color:#C47A00;}
+.plan-standard{background:#FFE8D6;color:#C45000;}
+.plan-basic{background:var(--lgreen);color:var(--green);}
+.cust-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.status-active{background:var(--lgreen);color:var(--green);}
+.status-paused{background:#FFF3DC;color:#C47A00;}
+.status-expired{background:#FFE8E8;color:#C40000;}
+.cust-meta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;align-items:center;}
+
+/* CUSTOMER DETAIL */
+.cd-header{background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:18px;padding:18px;color:white;margin-bottom:14px;}
+.cd-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin-bottom:10px;}
+.cd-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.cd-phone{font-size:13px;opacity:0.85;margin-top:3px;}
+.cd-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.cd-badge{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.35);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;}
+.cd-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.cd-stat{background:white;border-radius:13px;padding:13px 10px;text-align:center;box-shadow:var(--shadow);}
+.cd-stat-val{font-size:20px;font-weight:900;color:var(--saffron);}
+.cd-stat-lbl{font-size:10px;color:#888;margin-top:2px;}
+
+/* PAYMENT HISTORY */
+.ph-filter{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.ph-chip{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid #EDE8E2;background:white;color:#888;white-space:nowrap;transition:all 0.2s;}
+.ph-chip.active{border-color:var(--saffron);background:#FFF3EC;color:var(--saffron);}
+.ph-item{background:white;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:10px;display:flex;align-items:center;gap:13px;}
+.ph-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ph-info{flex:1;min-width:0;}
+.ph-desc{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-meta{font-size:10px;color:#aaa;margin-top:2px;}
+.ph-right{text-align:right;flex-shrink:0;}
+.ph-amt{font-size:15px;font-weight:900;}
+.ph-amt.credit{color:var(--green);}
+.ph-amt.debit{color:#C40000;}
+.ph-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:2px;display:inline-block;}
+.ps-paid{background:var(--lgreen);color:var(--green);}
+.ps-pending{background:#FFF3DC;color:#C47A00;}
+.ps-failed{background:#FFE8E8;color:#C40000;}
+
+/* SUMMARY STATS */
+.stat-bar{background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;}
+.stat-bar-title{font-size:13px;font-weight:800;margin-bottom:12px;color:var(--dark);}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.stat-box{text-align:center;padding:12px 6px;border-radius:12px;}
+.stat-box.orange{background:#FFF3EC;}
+.stat-box.green{background:var(--lgreen);}
+.stat-box.blue{background:var(--lblue);}
+.stat-num{font-size:20px;font-weight:900;}
+.stat-num.o{color:var(--saffron);}
+.stat-num.gr{color:var(--green);}
+.stat-num.bl{color:var(--blue);}
+.stat-lbl{font-size:10px;color:#888;margin-top:2px;}
+
+/* TABS inside pages */
+.inner-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;}
+.itab{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid #EDE8E2;background:white;color:#888;white-space:nowrap;}
+.itab.active{border-color:var(--saffron);background:#FFF3EC;color:var(--saffron);}
+
+/* ===================== DASHBOARD ===================== */
+.dash-header{background:linear-gradient(135deg,#1A0A00 0%,#3D1F00 50%,#FF6B00 100%);padding:28px 18px 36px;position:relative;overflow:hidden;}
+.dash-header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,0.05);border-radius:50%;}
+.dash-header::after{content:'';position:absolute;bottom:-60px;left:-20px;width:200px;height:200px;background:rgba(255,107,0,0.15);border-radius:50%;}
+.dash-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;}
+.dash-greeting{color:white;}
+.dash-greeting .dg-sub{font-size:11px;opacity:0.7;margin-bottom:4px;}
+.dash-greeting .dg-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.2;}
+.dash-date{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:8px 13px;text-align:right;}
+.dash-date .dd-day{font-size:22px;font-weight:900;color:white;line-height:1;}
+.dash-date .dd-info{font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;}
+.dash-live{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:5px 13px;margin-top:14px;font-size:11px;font-weight:700;color:white;position:relative;z-index:1;}
+
+/* TODAY MEAL COUNT - BIG HERO CARD */
+.meal-count-hero{background:white;border-radius:20px;margin:0 14px;margin-top:-22px;padding:20px;box-shadow:0 12px 40px rgba(255,107,0,0.18);position:relative;z-index:2;}
+.mch-title{font-size:12px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.mch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.mch-item{border-radius:14px;padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
+.mch-item.premium{background:linear-gradient(135deg,#FFF3DC,#FFE8B0);}
+.mch-item.standard{background:linear-gradient(135deg,#FFE8D6,#FFCBA4);}
+.mch-item.basic{background:linear-gradient(135deg,#E8F5EB,#C2E8CC);}
+.mch-num{font-size:32px;font-weight:900;line-height:1;}
+.mch-num.premium{color:#C47A00;}
+.mch-num.standard{color:#C45000;}
+.mch-num.basic{color:var(--green);}
+.mch-plan{font-size:10px;font-weight:800;margin-top:3px;opacity:0.75;}
+.mch-total-row{background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:13px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;color:white;}
+.mch-total-lbl{font-size:12px;font-weight:700;opacity:0.9;}
+.mch-total-val{font-size:28px;font-weight:900;}
+
+/* FOOD PREP BREAKDOWN */
+.prep-card{background:white;border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;}
+.prep-title{font-size:13px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.prep-item{background:var(--cream);border-radius:12px;padding:13px 12px;display:flex;align-items:center;gap:10px;}
+.prep-ico{font-size:26px;flex-shrink:0;}
+.prep-info{flex:1;}
+.prep-name{font-size:11px;font-weight:800;color:var(--dark);}
+.prep-count{font-size:20px;font-weight:900;color:var(--saffron);line-height:1.1;}
+.prep-unit{font-size:10px;color:#aaa;}
+
+/* DELIVERY STATUS RINGS */
+.delivery-ring-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.dring{background:white;border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--shadow);}
+.dring-circle{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-size:22px;position:relative;}
+.dring-circle.delivered{background:var(--lgreen);}
+.dring-circle.transit{background:#FFF3DC;}
+.dring-circle.pending{background:#F0F0FF;}
+.dring-num{font-size:18px;font-weight:900;}
+.dring-lbl{font-size:10px;color:#aaa;font-weight:700;}
+
+/* HOURLY CHART */
+.hour-chart{background:white;border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;}
+.hour-bars{display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:12px;}
+.hbar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.hbar{width:100%;border-radius:5px 5px 0 0;transition:height 0.5s ease;min-height:4px;}
+.hbar.active-slot{background:linear-gradient(135deg,#FF6B00,#FFB347);}
+.hbar.past-slot{background:#F0EAE2;}
+.hbar.future-slot{background:#F7F7F7;}
+.hbar-lbl{font-size:9px;color:#bbb;font-weight:700;}
+
+/* QUICK ACTIONS */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.qa-btn{background:white;border-radius:14px;padding:14px 12px;box-shadow:var(--shadow);cursor:pointer;transition:all 0.2s;border:2px solid transparent;text-align:center;}
+.qa-btn:hover{border-color:var(--saffron);transform:translateY(-2px);}
+.qa-ico{font-size:26px;margin-bottom:5px;}
+.qa-lbl{font-size:11px;font-weight:800;color:var(--dark);}
+.qa-sub{font-size:10px;color:#bbb;margin-top:1px;}
+
+/* ALERT BANNER */
+.alert-band{border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.alert-band.warn{background:#FFF3DC;border:1px solid #FFE0A0;}
+.alert-band.info{background:var(--lblue);border:1px solid #C0D8FF;}
+.alert-band.success{background:var(--lgreen);border:1px solid #B0DDB8;}
+.alert-ico{font-size:22px;flex-shrink:0;}
+.alert-text{flex:1;}
+.alert-title{font-size:12px;font-weight:800;}
+.alert-desc{font-size:10px;color:#888;margin-top:1px;}
+
+/* RECENT ACTIVITY */
+.activity-item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid #F5EDE4;}
+.activity-item:last-child{border-bottom:none;}
+.act-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.act-info{flex:1;min-width:0;}
+.act-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.act-time{font-size:10px;color:#bbb;margin-top:1px;}
+.act-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;}
+
+/* ===================== DELIVERY ROUTINE ===================== */
+.dr-header{background:linear-gradient(135deg,#0F4C2A,#2D7A3A,#4ABA5A);padding:24px 18px 30px;position:relative;overflow:hidden;}
+.dr-header::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,0.06);border-radius:50%;}
+.dr-toprow{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;}
+.dr-title-block .dr-label{font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:3px;}
+.dr-title-block .dr-heading{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:white;}
+.dr-clock-box{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:8px 12px;text-align:center;}
+.dr-clock-time{font-size:18px;font-weight:900;color:white;font-family:'Playfair Display',serif;}
+.dr-clock-date{font-size:9px;color:rgba(255,255,255,0.75);margin-top:2px;}
+.dr-progress-wrap{position:relative;z-index:1;margin-top:16px;}
+.dr-progress-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.8);margin-bottom:5px;}
+.dr-progress-bar{background:rgba(255,255,255,0.2);border-radius:20px;height:8px;overflow:hidden;}
+.dr-progress-fill{height:100%;background:linear-gradient(90deg,#4AFF6B,#00CC44);border-radius:20px;transition:width 1s ease;}
+.dr-status-pills{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;position:relative;z-index:1;}
+.dr-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:white;}
+
+.dr-filter-row{display:flex;gap:6px;overflow-x:auto;padding:14px 14px 6px;max-width:520px;margin:0 auto;}
+.dr-chip{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid #EDE8E2;background:white;color:#888;white-space:nowrap;flex-shrink:0;}
+.dr-chip.on{border-color:var(--saffron);background:#FFF3EC;color:var(--saffron);}
+
+.dr-list{padding:0 14px 100px;max-width:520px;margin:0 auto;}
+.dr-card{background:white;border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border-left:5px solid #E0E0E0;transition:all 0.3s;}
+.dr-card.st-pending{border-left-color:#DDD;}
+.dr-card.st-cooking{border-left-color:#F5A623;}
+.dr-card.st-packed{border-left-color:var(--blue);}
+.dr-card.st-transit{border-left-color:var(--saffron);}
+.dr-card.st-delivered{border-left-color:var(--green);background:#FAFFF8;}
+.dr-card.st-cancelled{border-left-color:#C40000;background:#FFF5F5;opacity:0.85;}
+.dsb-cancelled{background:#FFE8E8;color:#C40000;}
+.dr-btn-cancel{background:#FFE8E8;color:#C40000;border:1.5px solid #FFBBBB;}
+.dr-btn-cancel:hover{background:#FFD0D0;}
+.dr-btn-restore{background:#FFF3DC;color:#C47A00;border:1.5px solid #FFD89A;}
+.dr-card-top{display:flex;align-items:center;gap:11px;margin-bottom:11px;}
+.dr-cust-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:white;flex-shrink:0;}
+.dr-cust-info{flex:1;min-width:0;}
+.dr-cust-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dr-cust-addr{font-size:10px;color:#aaa;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dr-status-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;}
+.dsb-pending{background:#F0F0F0;color:#888;}
+.dsb-cooking{background:#FFF3DC;color:#C47A00;}
+.dsb-packed{background:#E8F0FF;color:var(--blue);}
+.dsb-transit{background:#FFF0E8;color:var(--saffron);}
+.dsb-delivered{background:var(--lgreen);color:var(--green);}
+
+.dr-steps-mini{display:flex;align-items:center;gap:0;margin-bottom:12px;overflow:hidden;}
+.dr-step-mini{flex:1;height:4px;background:#F0EAE2;position:relative;}
+.dr-step-mini.done{background:var(--green);}
+.dr-step-mini.active-step{background:linear-gradient(90deg,var(--green),var(--saffron));animation:pulse-step 1.2s infinite;}
+@keyframes pulse-step{0%,100%{opacity:1}50%{opacity:0.6}}
+.dr-step-mini:first-child{border-radius:4px 0 0 4px;}
+.dr-step-mini:last-child{border-radius:0 4px 4px 0;}
+
+.dr-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.dr-plan-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.dr-meal-info{font-size:10px;color:#888;}
+.dr-actions{display:flex;gap:6px;}
+.dr-btn{padding:7px 12px;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.dr-btn-next{background:linear-gradient(135deg,#FF6B00,#FF8C00);color:white;}
+.dr-btn-next:hover{transform:translateY(-1px);}
+.dr-btn-call{background:var(--lgreen);color:var(--green);}
+.dr-btn-done{background:var(--lgreen);color:var(--green);font-size:12px;}
+
+.dr-time-badge{font-size:10px;color:#888;display:flex;align-items:center;gap:4px;}
+
+.auto-start-banner{margin:14px 14px 0;max-width:calc(520px - 28px);background:linear-gradient(135deg,#2D7A3A,#4ABA5A);border-radius:16px;padding:14px 16px;color:white;display:flex;align-items:center;gap:12px;}
+.asb-icon{font-size:28px;flex-shrink:0;}
+.asb-info{flex:1;}
+.asb-title{font-size:13px;font-weight:800;}
+.asb-desc{font-size:10px;opacity:0.85;margin-top:2px;}
+.asb-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.35);border-radius:10px;padding:6px 12px;font-size:11px;font-weight:700;color:white;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.asb-btn:hover{background:rgba(255,255,255,0.3);}
+.cbar a{color:#90EE90;text-decoration:none;}
+.foot{background:var(--dark);color:rgba(255,255,255,0.7);text-align:center;padding:18px 14px 100px;font-size:11px;}
+.foot strong{color:white;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px 20px;}
+.empty-state .ei{font-size:44px;margin-bottom:10px;}
+.empty-state .et{font-size:14px;font-weight:700;color:#ccc;}
+.empty-state .es{font-size:11px;color:#bbb;margin-top:4px;}
+
+/* BADGE TAG */
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+</style>
+</head>
+<body>
+<div id="appShell">
+<div id="pageArea">
+
+<!-- ==================== INSTALL BANNER ==================== -->
+<div id="installBanner" style="display:none;position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#FF6B00,#FF8C00);padding:10px 14px;display:flex;align-items:center;gap:10px;">
+  <div style="font-size:22px;">🍱</div>
+  <div style="flex:1;">
+    <div style="font-size:12px;font-weight:800;color:white;">Add to Home Screen</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.85);">Install Asan Tiffin as an app</div>
+  </div>
+  <button id="installBtn" style="background:white;color:var(--saffron);border:none;border-radius:9px;padding:7px 13px;font-weight:800;font-size:11px;cursor:pointer;">Install</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div class="page active" id="page-dashboard">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="dash-top">
+      <div class="dash-greeting">
+        <div class="dg-sub">Good morning, Admin 👋</div>
+        <div class="dg-title">Kitchen<br>Dashboard</div>
+      </div>
+      <div class="dash-date">
+        <div class="dd-day" id="dashDay">26</div>
+        <div class="dd-info" id="dashDate">Feb 2024</div>
+        <div class="dd-info" id="dashTime" style="color:#FFB347;font-weight:700;">--:-- --</div>
+      </div>
+    </div>
+    <div class="dash-live"><div class="pd"></div> Live · Auto-refresh</div>
+  </div>
+
+  <!-- TODAY MEAL COUNT HERO -->
+  <div class="meal-count-hero">
+    <div class="mch-title">🍱 Today's Meal Count</div>
+    <div class="mch-grid">
+      <div class="mch-item premium">
+        <div class="mch-num premium" id="mc-premium">0</div>
+        <div class="mch-plan">👑 Premium</div>
+      </div>
+      <div class="mch-item standard">
+        <div class="mch-num standard" id="mc-standard">0</div>
+        <div class="mch-plan">🌟 Standard</div>
+      </div>
+      <div class="mch-item basic">
+        <div class="mch-num basic" id="mc-basic">0</div>
+        <div class="mch-plan">🌿 Basic</div>
+      </div>
+    </div>
+    <div class="mch-total-row">
+      <div>
+        <div class="mch-total-lbl">Total Tiffins Today</div>
+        <div style="font-size:10px;opacity:0.75;margin-top:2px;">All active subscriptions</div>
+      </div>
+      <div class="mch-total-val" id="mc-total">0</div>
+    </div>
+  </div>
+
+  <div class="sec" style="padding-top:16px;">
+
+    <!-- ALERT -->
+    <div class="alert-band warn" id="dashAlert">
+      <div class="alert-ico">⚠️</div>
+      <div class="alert-text">
+        <div class="alert-title" id="alertTitle">Loading data...</div>
+        <div class="alert-desc" id="alertDesc">Please wait</div>
+      </div>
+    </div>
+
+    <!-- FOOD PREP BREAKDOWN -->
+    <div class="prep-card">
+      <div class="prep-title">
+        <span>👨‍🍳 Kitchen Prep List</span>
+        <span style="font-size:10px;color:#bbb;font-weight:600;">for today</span>
+      </div>
+      <div class="prep-grid">
+        <div class="prep-item">
+          <div class="prep-ico">🫓</div>
+          <div class="prep-info">
+            <div class="prep-name">Rotis to Make</div>
+            <div class="prep-count" id="prep-roti">0</div>
+            <div class="prep-unit">pieces (4 per tiffin)</div>
+          </div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-ico">🥘</div>
+          <div class="prep-info">
+            <div class="prep-name">Sabzi Portions</div>
+            <div class="prep-count" id="prep-sabzi">0</div>
+            <div class="prep-unit">bowls (2 per tiffin)</div>
+          </div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-ico">🍚</div>
+          <div class="prep-info">
+            <div class="prep-name">Rice Portions</div>
+            <div class="prep-count" id="prep-rice">0</div>
+            <div class="prep-unit">servings (1 per tiffin)</div>
+          </div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-ico">📦</div>
+          <div class="prep-info">
+            <div class="prep-name">Tiffin Boxes</div>
+            <div class="prep-count" id="prep-boxes">0</div>
+            <div class="prep-unit">boxes needed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY STATUS -->
+    <div class="prep-card">
+      <div class="prep-title"><span>🚴 Delivery Status</span><span style="font-size:10px;color:#bbb;font-weight:600;">live today</span></div>
+      <div class="delivery-ring-row">
+        <div class="dring">
+          <div class="dring-circle delivered">✅</div>
+          <div class="dring-num" style="color:var(--green);" id="del-done">0</div>
+          <div class="dring-lbl">Delivered</div>
+        </div>
+        <div class="dring">
+          <div class="dring-circle transit">🛵</div>
+          <div class="dring-num" style="color:#C47A00;" id="del-transit">0</div>
+          <div class="dring-lbl">In Transit</div>
+        </div>
+        <div class="dring">
+          <div class="dring-circle pending">⏳</div>
+          <div class="dring-num" style="color:var(--blue);" id="del-pending">0</div>
+          <div class="dring-lbl">Pending</div>
+        </div>
+      </div>
+      <!-- Progress bar -->
+      <div style="background:#F0EAE2;border-radius:20px;height:10px;overflow:hidden;">
+        <div id="delProgressBar" style="height:100%;background:linear-gradient(90deg,#2D7A3A,#4ABA5A);border-radius:20px;transition:width 0.8s ease;width:0%;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:#bbb;">
+        <span>0%</span><span id="delPct" style="font-weight:700;color:var(--green);">0% completed</span><span>100%</span>
+      </div>
+    </div>
+
+    <!-- HOURLY DELIVERY CHART -->
+    <div class="hour-chart">
+      <div class="prep-title"><span>⏰ Delivery Time Slots</span><span style="font-size:10px;color:#bbb;font-weight:600;">tiffins per hour</span></div>
+      <div class="hour-bars" id="hourBars"></div>
+    </div>
+
+    <!-- TODAY REVENUE -->
+    <div class="prep-card">
+      <div class="prep-title"><span>💰 Today's Revenue</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:linear-gradient(135deg,#FFF3EC,#FFE0CC);border-radius:13px;padding:13px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:var(--saffron);" id="rev-collected">₹0</div>
+          <div style="font-size:10px;color:#C47A00;font-weight:700;margin-top:2px;">Collected</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#FFF9DC,#FFEEB0);border-radius:13px;padding:13px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:#B8860B;" id="rev-pending">₹0</div>
+          <div style="font-size:10px;color:#B8860B;font-weight:700;margin-top:2px;">Pending</div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:13px;padding:13px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;color:white;">
+        <div style="font-size:12px;font-weight:700;opacity:0.9;">Monthly Revenue</div>
+        <div style="font-size:20px;font-weight:900;" id="rev-monthly">₹0</div>
+      </div>
+    </div>
+
+    <!-- PLAN BREAKDOWN BARS -->
+    <div class="prep-card">
+      <div class="prep-title"><span>📊 Plan Distribution</span></div>
+      <div id="planBars"></div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div style="font-size:13px;font-weight:800;margin-bottom:10px;">⚡ Quick Actions</div>
+    <div class="qa-grid">
+      <div class="qa-btn" onclick="showPage('customers');openAddCustomer()">
+        <div class="qa-ico">➕</div>
+        <div class="qa-lbl">Add Customer</div>
+        <div class="qa-sub">Register new member</div>
+      </div>
+      <div class="qa-btn" onclick="showPage('payhistory')">
+        <div class="qa-ico">💰</div>
+        <div class="qa-lbl">View Payments</div>
+        <div class="qa-sub">All transactions</div>
+      </div>
+      <div class="qa-btn" onclick="showPage('track')">
+        <div class="qa-ico">🚴</div>
+        <div class="qa-lbl">Track Delivery</div>
+        <div class="qa-sub">Live map status</div>
+      </div>
+      <div class="qa-btn" onclick="showPage('customers')">
+        <div class="qa-ico">👥</div>
+        <div class="qa-lbl">Customers</div>
+        <div class="qa-sub">Manage all records</div>
+      </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="prep-card" style="margin-bottom:0;">
+      <div class="prep-title"><span>🕐 Recent Activity</span></div>
+      <div id="recentActivity"></div>
+    </div>
+  </div>
+
+  <div class="cbar" style="margin-top:16px;">📞 Support: <a href="tel:+919876543210">+91 98765 43210</a></div>
+  <div class="foot"><strong>Asan Tiffin Service</strong><br>Dashboard v2.0 · Data updates every 30s</div>
+</div>
+
+<!-- ==================== DELIVERY ROUTINE ==================== -->
+<div class="page" id="page-routine">
+
+  <!-- Header -->
+  <div class="dr-header">
+    <div class="dr-toprow">
+      <div class="dr-title-block">
+        <div class="dr-label">🤖 Auto-Scheduled Daily</div>
+        <div class="dr-heading">Delivery Routine</div>
+      </div>
+      <div class="dr-clock-box">
+        <div class="dr-clock-time" id="drClock">--:--</div>
+        <div class="dr-clock-date" id="drDate">Today</div>
+      </div>
+    </div>
+    <div class="dr-progress-wrap">
+      <div class="dr-progress-label">
+        <span id="drSessionLabel">Overall Progress</span>
+        <span id="drProgressText">0 / 0 delivered</span>
+      </div>
+      <div class="dr-progress-bar">
+        <div class="dr-progress-fill" id="drProgressFill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="dr-status-pills">
+      <div class="dr-pill">⏳ <span id="pillPending">0</span></div>
+      <div class="dr-pill">🛵 <span id="pillTransit">0</span></div>
+      <div class="dr-pill">✅ <span id="pillDone">0</span></div>
+      <div class="dr-pill" style="background:rgba(196,0,0,0.25);border-color:rgba(255,100,100,0.4);">❌ <span id="pillCancelled">0</span></div>
+    </div>
+  </div>
+
+  <!-- Meal Session Tabs -->
+  <div class="session-tabs">
+    <div class="session-tab lunch-tab active" id="stLunch" onclick="setMealSession('lunch')">
+      <div class="st-ico">☀️</div>
+      <div class="st-lbl">Lunch</div>
+      <div class="st-time">9 AM – 12 PM</div>
+    </div>
+    <div class="session-tab dinner-tab" id="stDinner" onclick="setMealSession('dinner')">
+      <div class="st-ico">🌙</div>
+      <div class="st-lbl">Dinner</div>
+      <div class="st-time">7 PM – 9 PM</div>
+    </div>
+  </div>
+
+  <!-- Session Status Banner -->
+  <div style="padding:10px 14px 0;max-width:520px;margin:0 auto;">
+    <div class="session-banner" id="sessionBanner">
+      <div class="sb-ico" id="sbIco">☀️</div>
+      <div class="sb-info">
+        <div class="sb-title" id="sbTitle">Lunch Delivery</div>
+        <div class="sb-desc" id="sbDesc">9:00 AM – 12:00 PM</div>
+      </div>
+      <div class="sb-badge" id="sbBadge">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Session Summary -->
+  <div class="meal-session-summary" id="sessionSummary"></div>
+
+  <!-- Auto-start banner -->
+  <div style="padding:10px 14px 0;max-width:520px;margin:0 auto;">
+    <div class="auto-start-banner" id="autoStartBanner">
+      <div class="asb-icon">🤖</div>
+      <div class="asb-info">
+        <div class="asb-title">Auto Routine Active</div>
+        <div class="asb-desc" id="autoStartDesc">Status updates automatically based on time</div>
+      </div>
+      <button class="asb-btn" onclick="resetSession()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="dr-filter-row">
+    <div class="dr-chip on" onclick="setDrFilter('all',this)">All</div>
+    <div class="dr-chip" onclick="setDrFilter('pending',this)">⏳ Pending</div>
+    <div class="dr-chip" onclick="setDrFilter('cooking',this)">👨‍🍳 Cooking</div>
+    <div class="dr-chip" onclick="setDrFilter('packed',this)">📦 Packed</div>
+    <div class="dr-chip" onclick="setDrFilter('transit',this)">🛵 Transit</div>
+    <div class="dr-chip" onclick="setDrFilter('delivered',this)">✅ Delivered</div>
+    <div class="dr-chip" onclick="setDrFilter('cancelled',this)" style="border-color:#FFB0B0;color:#C40000;">❌ Cancelled</div>
+  </div>
+
+  <!-- Delivery List -->
+  <div class="dr-list" id="drList">
+    <div class="empty-state"><div class="ei">🛵</div><div class="et">Loading routine...</div></div>
+  </div>
+</div>
+
+<!-- ==================== HOME ==================== -->
+<div class="page" id="page-home">
+  <div class="hero">
+    <div class="brand"><span style="font-size:26px;">🍱</span><span class="brand-name">Asan Tiffin</span></div>
+    <h1>Ghar Ka Khana,<br>Roz Teri Rasoi</h1>
+    <p>Fresh home-style tiffin delivered daily — healthy, tasty &amp; affordable</p>
+    <div class="hero-badge">🕐 On-time delivery every day</div>
+  </div>
+  <div class="sec">
+    <div class="stitle">Daily Tiffin Includes</div>
+    <div class="ssub">Every meal packed fresh with love 🫶</div>
+    <div class="card" style="margin-bottom:18px;">
+      <div class="fgrid">
+        <div class="fi"><div class="fem">🫓</div><div class="flbl">4 Rotis</div><div class="fdesc">Soft &amp; fresh</div></div>
+        <div class="fi"><div class="fem">🥘</div><div class="flbl">2 Sabzi</div><div class="fdesc">Dry + Gravy</div></div>
+        <div class="fi"><div class="fem">🍚</div><div class="flbl">1 Chaval</div><div class="fdesc">Steamed rice</div></div>
+        <div class="fi"><div class="fem">✅</div><div class="flbl">No Maida</div><div class="fdesc">Pure atta rotis</div></div>
+      </div>
+    </div>
+    <div class="stitle">Monthly Plans</div>
+    <div class="ssub">Choose what suits you best</div>
+    <div class="mc pop">
+      <div class="ptag">⭐ Best Value</div>
+      <div class="ph"><div class="pi g">👑</div><div><div class="pname">Premium Plan</div><div class="pp">₹2,500 <span>/ month</span></div></div></div>
+      <div class="div"></div>
+      <div class="mi">
+        <div class="mit"><div class="mii">🫓</div>4 Rotis</div>
+        <div class="mit"><div class="mii">🥘</div>Sabzi #1</div>
+        <div class="mit"><div class="mii">🍛</div>Sabzi #2</div>
+        <div class="mit"><div class="mii">🍚</div>Chaval</div>
+      </div>
+      <div style="font-size:10px;color:#999;margin-bottom:10px;">+ Dal / Salad on select days</div>
+      <button class="btn btn-p" onclick="openOrder('Premium Plan',2500)">Subscribe Now 🚀</button>
+    </div>
+    <div class="mc">
+      <div class="ph"><div class="pi o">🌟</div><div><div class="pname">Standard Plan</div><div class="pp">₹2,000 <span>/ month</span></div></div></div>
+      <div class="div"></div>
+      <div class="mi">
+        <div class="mit"><div class="mii">🫓</div>4 Rotis</div>
+        <div class="mit"><div class="mii">🥘</div>Sabzi #1</div>
+        <div class="mit"><div class="mii">🍛</div>Sabzi #2</div>
+        <div class="mit"><div class="mii">🍚</div>Chaval</div>
+      </div>
+      <div style="font-size:10px;color:#999;margin-bottom:10px;">Core daily essentials</div>
+      <button class="btn btn-o" onclick="openOrder('Standard Plan',2000)">Subscribe Now</button>
+    </div>
+    <div class="mc">
+      <div class="ph"><div class="pi gr">🌿</div><div><div class="pname">Basic Plan</div><div class="pp">₹1,500 <span>/ month</span></div></div></div>
+      <div class="div"></div>
+      <div class="mi">
+        <div class="mit"><div class="mii">🫓</div>2 Rotis</div>
+        <div class="mit"><div class="mii">🥘</div>Sabzi #1</div>
+        <div class="mit"><div class="mii">🍛</div>Sabzi #2</div>
+        <div class="mit"><div class="mii">🍚</div>Chaval</div>
+      </div>
+      <div style="font-size:10px;color:#999;margin-bottom:10px;">Budget-friendly daily tiffin</div>
+      <button class="btn btn-o" onclick="openOrder('Basic Plan',1500)">Subscribe Now</button>
+    </div>
+    <div class="card">
+      <div class="stitle" style="font-size:15px;">Why Asan Tiffin?</div>
+      <div class="fgrid">
+        <div class="fi"><div class="fem">🏠</div><div class="flbl">Home Style</div><div class="fdesc">Cooked fresh</div></div>
+        <div class="fi"><div class="fem">🚴</div><div class="flbl">Free Delivery</div><div class="fdesc">To your door</div></div>
+        <div class="fi"><div class="fem">🧹</div><div class="flbl">Hygienic</div><div class="fdesc">Clean kitchen</div></div>
+        <div class="fi"><div class="fem">📅</div><div class="flbl">Flexible</div><div class="fdesc">Pause anytime</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cbar">📞 WhatsApp: <a href="tel:+919876543210">+91 98765 43210</a></div>
+  <div class="foot"><strong>Asan Tiffin Service</strong><br>Serving with ❤️ every day | Mon–Sat</div>
+</div>
+
+<!-- ==================== TRACK ==================== -->
+<div class="page" id="page-track">
+  <div class="sec">
+    <div class="stitle" style="margin-bottom:3px;">🚴 Track Delivery</div>
+    <div class="ssub">Today's tiffin live status</div>
+    <div class="track-top">
+      <h3 style="font-family:'Playfair Display',serif;font-size:16px;margin-bottom:4px;">Today's Tiffin</h3>
+      <div class="t-badge"><div class="pd"></div> Live Tracking</div>
+      <div class="t-eta">12 <span>mins away</span></div>
+      <div style="font-size:11px;opacity:0.85;">Estimated delivery: 1:15 PM</div>
+    </div>
+    <div class="oid-bar">
+      <div><div class="oid-lbl">Order ID</div><div class="oid-val" id="displayOId">#AT-20240226</div></div>
+      <button class="copy-btn" onclick="copyOId()">📋 Copy</button>
+    </div>
+    <div class="mapbox">
+      <div class="mlabel">📍 Live Delivery Route</div>
+      <div class="mroad"></div>
+      <div class="mbike">🛵</div>
+    </div>
+    <div class="steps">
+      <div style="font-size:13px;font-weight:800;margin-bottom:14px;">Delivery Progress</div>
+      <div class="srow"><div class="sline"></div><div class="sdot done">✅</div><div class="sinfo"><div class="stit">Order Confirmed</div><div class="stm">Today, 11:00 AM</div></div></div>
+      <div class="srow"><div class="sline"></div><div class="sdot done">👨‍🍳</div><div class="sinfo"><div class="stit">Cooking Started</div><div class="stm">Today, 11:30 AM</div></div></div>
+      <div class="srow"><div class="sline"></div><div class="sdot done">📦</div><div class="sinfo"><div class="stit">Tiffin Packed</div><div class="stm">Today, 12:30 PM</div></div></div>
+      <div class="srow"><div class="sline"></div><div class="sdot active">🛵</div><div class="sinfo"><div class="stit">Out for Delivery</div><div class="stm act">🔴 Live — 12 mins away</div></div></div>
+      <div class="srow"><div class="sdot pend">🏠</div><div class="sinfo"><div class="stit pend">Delivered</div><div class="stm">Expected 1:15 PM</div></div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:48px;height:48px;background:#FFF3DC;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">👨</div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:800;">Raju Delivery</div><div style="font-size:10px;color:#999;">Your delivery partner today</div><div style="font-size:10px;color:#888;margin-top:2px;">⭐ 4.9 · 230+ deliveries</div></div>
+        <a href="tel:+919876543210" style="text-decoration:none;"><div style="width:38px;height:38px;background:linear-gradient(135deg,#2D7A3A,#3BA84D);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📞</div></a>
+      </div>
+    </div>
+    <button class="btn btn-p" onclick="refreshTrack(this)">🔄 Refresh Status</button>
+  </div>
+</div>
+
+<!-- ==================== PAYMENT PAGE ==================== -->
+<div class="page" id="page-payment">
+  <div class="sec">
+    <div class="stitle" style="margin-bottom:3px;">💳 Payment</div>
+    <div class="ssub">Pay securely for your subscription</div>
+    <div class="card">
+      <div class="ptitle" style="font-size:14px;font-weight:800;margin-bottom:3px;">Select Plan</div>
+      <div style="font-size:11px;color:#999;margin-bottom:13px;">Choose your monthly tiffin plan</div>
+      <div>
+        <div class="pm sel" id="pp1" onclick="selPlan(1,2500,'Premium Plan')">
+          <div class="pmico" style="background:#FFF3DC;">👑</div>
+          <div class="pminfo"><div class="pmname">Premium Plan</div><div class="pmdesc">4 Roti + 2 Sabzi + Chaval + Extra</div></div>
+          <div style="font-weight:900;color:var(--saffron);font-size:14px;margin-right:6px;">₹2,500</div>
+          <div class="prad sel" id="pr1"></div>
+        </div>
+        <div class="pm" id="pp2" onclick="selPlan(2,2000,'Standard Plan')">
+          <div class="pmico" style="background:#FFE8D6;">🌟</div>
+          <div class="pminfo"><div class="pmname">Standard Plan</div><div class="pmdesc">4 Roti + 2 Sabzi + Chaval</div></div>
+          <div style="font-weight:900;color:var(--saffron);font-size:14px;margin-right:6px;">₹2,000</div>
+          <div class="prad" id="pr2"></div>
+        </div>
+        <div class="pm" id="pp3" onclick="selPlan(3,1500,'Basic Plan')">
+          <div class="pmico" style="background:var(--lgreen);">🌿</div>
+          <div class="pminfo"><div class="pmname">Basic Plan</div><div class="pmdesc">2 Roti + 2 Sabzi + Chaval</div></div>
+          <div style="font-weight:900;color:var(--saffron);font-size:14px;margin-right:6px;">₹1,500</div>
+          <div class="prad" id="pr3"></div>
+        </div>
+      </div>
+    </div>
+    <div class="psum">
+      <div class="prow"><span class="l">Plan</span><span class="v" id="payPN">Premium Plan</span></div>
+      <div class="prow"><span class="l">Duration</span><span class="v">1 Month (30 days)</span></div>
+      <div class="prow"><span class="l">Delivery</span><span class="v" style="color:var(--green);">FREE</span></div>
+      <div class="prow tot"><span class="l">Total Amount</span><span class="v" id="payTot">₹2,500</span></div>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:3px;">Payment Method</div>
+      <div style="font-size:11px;color:#999;margin-bottom:13px;">Choose how you want to pay</div>
+      <div class="pm sel" id="mUPI" onclick="selMethod('UPI')">
+        <div class="pmico" style="background:#E8F5EB;">📱</div>
+        <div class="pminfo"><div class="pmname">UPI</div><div class="pmdesc">GPay, PhonePe, Paytm, BHIM</div></div>
+        <div class="prad sel" id="rUPI"></div>
+      </div>
+      <div id="upiWrap" style="margin-bottom:8px;padding:11px;background:#FFFAF6;border-radius:0 0 11px 11px;border:2px solid var(--saffron);border-top:none;">
+        <div style="display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap;">
+          <div class="tag sel" id="uGPay" style="background:#FFF3EC;color:var(--saffron);cursor:pointer;padding:5px 11px;border:2px solid var(--saffron);" onclick="selUPI('GPay',this)">🟢 GPay</div>
+          <div class="tag" id="uPhone" style="background:var(--cream);color:#888;cursor:pointer;padding:5px 11px;border:2px solid #EDE8E2;" onclick="selUPI('Phone',this)">🟣 PhonePe</div>
+          <div class="tag" id="uPaytm" style="background:var(--cream);color:#888;cursor:pointer;padding:5px 11px;border:2px solid #EDE8E2;" onclick="selUPI('Paytm',this)">🔵 Paytm</div>
+          <div class="tag" id="uOther" style="background:var(--cream);color:#888;cursor:pointer;padding:5px 11px;border:2px solid #EDE8E2;" onclick="selUPI('Other',this)">💸 Other</div>
+        </div>
+        <div class="fg" style="margin-bottom:0;"><label>UPI ID / VPA</label><input type="text" placeholder="yourname@upi" /></div>
+      </div>
+      <div class="pm" id="mCard" onclick="selMethod('Card')">
+        <div class="pmico" style="background:#EEF2FF;">💳</div>
+        <div class="pminfo"><div class="pmname">Debit / Credit Card</div><div class="pmdesc">Visa, Mastercard, RuPay</div></div>
+        <div class="prad" id="rCard"></div>
+      </div>
+      <div id="cardWrap" style="display:none;margin-bottom:8px;padding:11px;background:#F8F7FF;border-radius:0 0 11px 11px;border:2px solid var(--saffron);border-top:none;">
+        <div class="fg"><label>Card Number</label><input type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" /></div>
+        <div class="frow">
+          <div class="fg"><label>Expiry (MM/YY)</label><input type="text" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this)" /></div>
+          <div class="fg"><label>CVV</label><input type="password" placeholder="•••" maxlength="3" /></div>
+        </div>
+        <div class="fg" style="margin-bottom:0;"><label>Cardholder Name</label><input type="text" placeholder="As on card" /></div>
+      </div>
+      <div class="pm" id="mCOD" onclick="selMethod('COD')">
+        <div class="pmico" style="background:#FFFBEA;">💵</div>
+        <div class="pminfo"><div class="pmname">Cash on Delivery</div><div class="pmdesc">Pay when tiffin arrives</div></div>
+        <div class="prad" id="rCOD"></div>
+      </div>
+      <div id="codNote" style="display:none;margin-bottom:8px;padding:10px 12px;background:#FFFBEA;border-radius:0 0 11px 11px;border:2px solid var(--saffron);border-top:none;font-size:11px;color:#888;">
+        💡 Pay in cash to the delivery person. Please keep exact change ready.
+      </div>
+      <div class="pm" id="mNet" onclick="selMethod('Net')">
+        <div class="pmico" style="background:#F3F0FF;">🏦</div>
+        <div class="pminfo"><div class="pmname">Net Banking</div><div class="pmdesc">All major banks supported</div></div>
+        <div class="prad" id="rNet"></div>
+      </div>
+      <div id="netWrap" style="display:none;margin-bottom:8px;padding:11px;background:#F8F7FF;border-radius:0 0 11px 11px;border:2px solid var(--saffron);border-top:none;">
+        <div class="fg" style="margin-bottom:0;"><label>Select Bank</label>
+          <select><option value="">-- Select your bank --</option><option>SBI</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Kotak Mahindra Bank</option><option>PNB</option><option>Bank of Baroda</option><option>Other Bank</option></select>
+        </div>
+      </div>
+      <button class="btn btn-g" style="margin-top:6px;" onclick="doPayment()">🔒 Pay Securely — <span id="payBtnA">₹2,500</span></button>
+      <div style="text-align:center;font-size:9px;color:#bbb;margin-top:8px;">🔐 256-bit SSL encrypted · Safe &amp; Secure</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CUSTOMERS ==================== -->
+<div class="page" id="page-customers">
+  <div class="sec">
+    <!-- LIST VIEW -->
+    <div id="custList">
+      <div class="cr-header">
+        <div><div class="stitle" style="margin-bottom:1px;">👥 Customers</div><div class="ssub" style="margin-bottom:0;">All registered customers</div></div>
+        <button class="btn btn-p btn-sm" onclick="openAddCustomer()">+ Add New</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-bar">
+        <div class="stat-bar-title">📈 Customer Overview</div>
+        <div class="stat-row">
+          <div class="stat-box orange"><div class="stat-num o" id="statTotal">0</div><div class="stat-lbl">Total</div></div>
+          <div class="stat-box green"><div class="stat-num gr" id="statActive">0</div><div class="stat-lbl">Active</div></div>
+          <div class="stat-box blue"><div class="stat-num bl" id="statRevenue">₹0</div><div class="stat-lbl">Revenue</div></div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="cr-search">
+        <span style="font-size:16px;">🔍</span>
+        <input type="text" id="custSearch" placeholder="Search by name or phone..." oninput="renderCustomers()" />
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="inner-tabs">
+        <div class="itab active" onclick="setCustFilter('all',this)">All</div>
+        <div class="itab" onclick="setCustFilter('active',this)">Active</div>
+        <div class="itab" onclick="setCustFilter('paused',this)">Paused</div>
+        <div class="itab" onclick="setCustFilter('expired',this)">Expired</div>
+      </div>
+
+      <div id="custContainer"></div>
+      <div id="noCust" class="empty-state" style="display:none;">
+        <div class="ei">👥</div>
+        <div class="et">No customers yet</div>
+        <div class="es">Add your first customer to get started</div>
+        <button class="btn btn-p" style="margin-top:14px;max-width:180px;" onclick="openAddCustomer()">+ Add Customer</button>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div id="custDetail" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button class="btn btn-o btn-sm" onclick="showCustList()">← Back</button>
+        <div style="font-size:13px;font-weight:700;color:#888;flex:1;" id="detailBreadcrumb">Customer Details</div>
+      </div>
+      <div class="cd-header" id="cdHeader"></div>
+      <div class="cd-stat-grid" id="cdStats"></div>
+      <!-- Payment Action Buttons -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <button class="btn btn-g" onclick="openAddPayment('add')" style="border-radius:13px;padding:13px;">
+          <div style="font-size:18px;margin-bottom:3px;">➕</div>
+          <div style="font-size:12px;">Add Payment</div>
+        </button>
+        <button class="btn btn-p" onclick="openAddPayment('deduct')" style="border-radius:13px;padding:13px;background:linear-gradient(135deg,#C40000,#FF2222);">
+          <div style="font-size:18px;margin-bottom:3px;">➖</div>
+          <div style="font-size:12px;">Deduct / Refund</div>
+        </button>
+      </div>
+      <div class="stitle" style="font-size:15px;margin-bottom:10px;">💳 Payment History</div>
+      <div id="cdPayments"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAYMENT HISTORY ==================== -->
+<div class="page" id="page-payhistory">
+  <div class="sec">
+    <div class="stitle" style="margin-bottom:3px;">📊 Payment History</div>
+    <div class="ssub">All transactions &amp; records</div>
+
+    <!-- Summary -->
+    <div class="stat-bar">
+      <div class="stat-bar-title">💰 Financial Summary</div>
+      <div class="stat-row">
+        <div class="stat-box orange"><div class="stat-num o" id="phTotal">₹0</div><div class="stat-lbl">Total Collected</div></div>
+        <div class="stat-box green"><div class="stat-num gr" id="phPaid">0</div><div class="stat-lbl">Paid</div></div>
+        <div class="stat-box blue"><div class="stat-num bl" id="phPending">0</div><div class="stat-lbl">Pending</div></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="ph-filter">
+      <div class="ph-chip active" onclick="setPhFilter('all',this)">All</div>
+      <div class="ph-chip" onclick="setPhFilter('paid',this)">Paid ✅</div>
+      <div class="ph-chip" onclick="setPhFilter('pending',this)">Pending ⏳</div>
+      <div class="ph-chip" onclick="setPhFilter('upi',this)">UPI 📱</div>
+      <div class="ph-chip" onclick="setPhFilter('card',this)">Card 💳</div>
+      <div class="ph-chip" onclick="setPhFilter('cod',this)">COD 💵</div>
+    </div>
+
+    <div id="phContainer"></div>
+    <div id="noPH" class="empty-state" style="display:none;">
+      <div class="ei">📊</div>
+      <div class="et">No transactions yet</div>
+      <div class="es">Payment records will appear here</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MY ORDERS ==================== -->
+<div class="page" id="page-orders">
+  <div class="sec">
+    <div class="stitle" style="margin-bottom:3px;">📋 My Orders</div>
+    <div class="ssub">Your subscription history</div>
+    <div id="ordersBox"></div>
+    <div id="noOrd" class="empty-state" style="display:none;">
+      <div class="ei">🍽️</div>
+      <div class="et">No orders yet</div>
+      <div class="es">Subscribe to a plan to get started!</div>
+      <button class="btn btn-p" style="margin-top:14px;max-width:180px;" onclick="showPage('home')">Browse Plans</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SUBSCRIBE MODAL ==================== -->
+<div class="overlay" id="ovl" onclick="ovlClick(event)">
+  <div class="modal" id="modl">
+    <button class="cbtn" onclick="closeModal()">✕</button>
+    <div id="s1">
+      <div class="mhandle"></div>
+      <h2>Subscribe to Tiffin</h2>
+      <p class="msub" id="mPlanDesc">Premium Plan — ₹2,500/month</p>
+      <div class="psum" style="margin-bottom:12px;">
+        <div class="prow"><span class="l">Plan</span><span class="v" id="mSPlan">Premium Plan</span></div>
+        <div class="prow tot"><span class="l">Total</span><span class="v" id="mSPrice">₹2,500</span></div>
+      </div>
+      <div class="fg"><label>Your Name *</label><input type="text" id="sNm" placeholder="Ramesh Kumar" /></div>
+      <div class="fg"><label>Phone Number *</label><input type="tel" id="sPh" placeholder="+91 98765 43210" /></div>
+      <div class="fg"><label>Delivery Address *</label><input type="text" id="sAd" placeholder="Flat no, Street, Area, City..." /></div>
+      <div class="fg"><label>Email (optional)</label><input type="email" id="sEm" placeholder="email@example.com" /></div>
+      <div class="fg"><label>Start Date</label><input type="date" id="sDt" /></div>
+      <button class="btn btn-p" onclick="goS2()">Next: Choose Payment →</button>
+    </div>
+    <div id="s2" style="display:none;">
+      <div class="mhandle"></div>
+      <h2>Quick Payment</h2>
+      <p class="msub">Choose payment method</p>
+      <div class="psum" style="margin-bottom:12px;">
+        <div class="prow tot"><span class="l">Amount Due</span><span class="v" id="qAmt">₹2,500</span></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div class="pm sel" id="qUPI" onclick="selQ('UPI')"><div class="pmico" style="background:#E8F5EB;">📱</div><div class="pminfo"><div class="pmname">UPI (GPay/PhonePe/Paytm)</div><div class="pmdesc">Fastest payment method</div></div><div class="prad sel" id="qrUPI"></div></div>
+        <div class="pm" id="qCard" onclick="selQ('Card')"><div class="pmico" style="background:#EEF2FF;">💳</div><div class="pminfo"><div class="pmname">Debit / Credit Card</div><div class="pmdesc">Visa, Mastercard, RuPay</div></div><div class="prad" id="qrCard"></div></div>
+        <div class="pm" id="qCOD" onclick="selQ('COD')"><div class="pmico" style="background:#FFFBEA;">💵</div><div class="pminfo"><div class="pmname">Cash on Delivery</div><div class="pmdesc">Pay when tiffin arrives</div></div><div class="prad" id="qrCOD"></div></div>
+        <div class="pm" id="qNet" onclick="selQ('Net')"><div class="pmico" style="background:#F3F0FF;">🏦</div><div class="pminfo"><div class="pmname">Net Banking</div><div class="pmdesc">All major banks</div></div><div class="prad" id="qrNet"></div></div>
+      </div>
+      <button class="btn btn-g" onclick="confirmSub()">🎉 Confirm &amp; Pay</button>
+      <button class="btn" style="margin-top:8px;background:var(--cream);color:#888;" onclick="document.getElementById('s2').style.display='none';document.getElementById('s1').style.display='block';">← Back</button>
+    </div>
+    <div class="proc" id="proc"><div class="spin"></div><div style="font-size:14px;font-weight:700;">Processing Payment...</div><div style="font-size:11px;color:#999;margin-top:4px;">Please wait, do not close</div></div>
+    <div class="succ" id="succ">
+      <div class="succ-ico">🎊</div>
+      <h2>Subscribed! Yay!</h2>
+      <p>Your tiffin subscription is confirmed.<br>First delivery starts from your selected date.</p>
+      <div class="oid-chip" id="succOId">#AT-000000</div>
+      <p style="color:var(--saffron);font-weight:700;font-size:13px;">Aapka khana roz aayega! 🍱</p>
+      <br>
+      <button class="btn btn-p" style="max-width:200px;margin:0 auto 8px;display:block;" onclick="closeModal();showPage('track')">📍 Track Delivery</button>
+      <button class="btn btn-o" style="max-width:200px;margin:0 auto;display:block;" onclick="closeModal();showPage('customers')">👥 View Customers</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADD CUSTOMER MODAL ==================== -->
+<div class="overlay" id="addCustOvl" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal">
+    <button class="cbtn" onclick="document.getElementById('addCustOvl').classList.remove('active')">✕</button>
+    <div class="mhandle"></div>
+    <h2>Add New Customer</h2>
+    <p class="msub">Register a customer manually</p>
+    <div class="fg"><label>Full Name *</label><input type="text" id="acNm" placeholder="Customer Name" /></div>
+    <div class="fg"><label>Phone *</label><input type="tel" id="acPh" placeholder="+91 98765 43210" /></div>
+    <div class="fg"><label>Email</label><input type="email" id="acEm" placeholder="email@example.com" /></div>
+    <div class="fg"><label>Delivery Address *</label><textarea id="acAd" placeholder="Full delivery address..."></textarea></div>
+    <div class="fg"><label>Plan *</label>
+      <select id="acPlan">
+        <option value="Premium Plan">👑 Premium Plan — ₹2,500/month</option>
+        <option value="Standard Plan">🌟 Standard Plan — ₹2,000/month</option>
+        <option value="Basic Plan">🌿 Basic Plan — ₹1,500/month</option>
+      </select>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Start Date</label><input type="date" id="acSt" /></div>
+      <div class="fg"><label>Status</label>
+        <select id="acStatus">
+          <option value="Active">Active ✅</option>
+          <option value="Paused">Paused ⏸️</option>
+          <option value="Expired">Expired ❌</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Payment Method</label>
+      <select id="acPay">
+        <option value="UPI">📱 UPI</option>
+        <option value="Card">💳 Card</option>
+        <option value="COD">💵 Cash on Delivery</option>
+        <option value="Net Banking">🏦 Net Banking</option>
+      </select>
+    </div>
+    <button class="btn btn-p" onclick="saveCustomer()">✅ Save Customer</button>
+  </div>
+</div>
+
+<!-- ==================== ADD / DEDUCT PAYMENT MODAL ==================== -->
+<div class="overlay" id="addPayOvl" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal">
+    <button class="cbtn" onclick="document.getElementById('addPayOvl').classList.remove('active')">✕</button>
+    <div class="mhandle"></div>
+    <div id="addPayContent"></div>
+  </div>
+</div>
+
+</div><!-- end pageArea -->
+
+<!-- BOTTOM NAV TAB BAR -->
+<div class="nav" id="mainNav">
+  <div class="nt active" onclick="showPage('dashboard')"><span class="ti">📊</span>Dash</div>
+  <div class="nt" onclick="showPage('home')"><span class="ti">🏠</span>Home</div>
+  <div class="nt" onclick="showPage('routine')"><span class="ti">🛵</span>Routine</div>
+  <div class="nt" onclick="showPage('track')"><span class="ti">📍</span>Track</div>
+  <div class="nt" onclick="showPage('payment')"><span class="ti">💳</span>Pay</div>
+  <div class="nt" onclick="showPage('customers')"><span class="ti">👥</span>Members</div>
+  <div class="nt" onclick="showPage('payhistory')"><span class="ti">💰</span>History</div>
+  <div class="nt" onclick="showPage('orders')"><span class="ti">📋</span>Orders</div>
+</div>
+
+</div><!-- end appShell -->
+
+<script>
+// ===== DATA =====
+let orders = [], customers = [], payments = [];
+let curPlan='Premium Plan', curPrice=2500, qMethod='UPI';
+let custFilter='all', phFilter='all';
+
+function loadData(){
+  try{ orders=JSON.parse(localStorage.getItem('at_orders')||'[]'); }catch(e){orders=[];}
+  try{ customers=JSON.parse(localStorage.getItem('at_customers')||'[]'); }catch(e){customers=[];}
+  try{ payments=JSON.parse(localStorage.getItem('at_payments')||'[]'); }catch(e){payments=[];}
+}
+function saveData(){
+  try{localStorage.setItem('at_orders',JSON.stringify(orders));}catch(e){}
+  try{localStorage.setItem('at_customers',JSON.stringify(customers));}catch(e){}
+  try{localStorage.setItem('at_payments',JSON.stringify(payments));}catch(e){}
+}
+
+
+// ===== NAV =====
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const tabs=['dashboard','home','routine','track','payment','customers','payhistory','orders'];
+  const idx=tabs.indexOf(id);
+  if(idx>=0)document.querySelectorAll('.nt')[idx].classList.add('active');
+  if(id==='orders')renderOrders();
+  if(id==='customers'){showCustList();renderCustomers();}
+  if(id==='payhistory')renderPayHistory();
+  if(id==='dashboard')renderDashboard();
+  if(id==='routine')renderRoutine();
+}
+
+// ===== ORDER / SUBSCRIBE =====
+function openOrder(plan,price){
+  curPlan=plan;curPrice=price;
+  document.getElementById('mPlanDesc').textContent=plan+' — ₹'+price.toLocaleString()+'/month';
+  document.getElementById('mSPlan').textContent=plan;
+  document.getElementById('mSPrice').textContent='₹'+price.toLocaleString();
+  document.getElementById('qAmt').textContent='₹'+price.toLocaleString();
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('sDt').min=today;document.getElementById('sDt').value=today;
+  ['s1','s2'].forEach(x=>{document.getElementById(x).style.display='none';});
+  document.getElementById('s1').style.display='block';
+  document.getElementById('proc').classList.remove('active');
+  document.getElementById('succ').classList.remove('active');
+  document.getElementById('ovl').classList.add('active');
+}
+function closeModal(){document.getElementById('ovl').classList.remove('active');}
+function ovlClick(e){if(e.target===document.getElementById('ovl'))closeModal();}
+
+function goS2(){
+  const nm=document.getElementById('sNm').value.trim();
+  const ph=document.getElementById('sPh').value.trim();
+  const ad=document.getElementById('sAd').value.trim();
+  if(!nm||!ph||!ad){alert('Please fill Name, Phone & Address!');return;}
+  document.getElementById('s1').style.display='none';
+  document.getElementById('s2').style.display='block';
+}
+
+function selQ(m){
+  qMethod=m;
+  ['UPI','Card','COD','Net'].forEach(x=>{
+    document.getElementById('q'+x).classList.remove('sel');
+    document.getElementById('qr'+x).classList.remove('sel');
+  });
+  document.getElementById('q'+m).classList.add('sel');
+  document.getElementById('qr'+m).classList.add('sel');
+}
+
+function confirmSub(){
+  document.getElementById('s2').style.display='none';
+  document.getElementById('proc').classList.add('active');
+  setTimeout(()=>{
+    document.getElementById('proc').classList.remove('active');
+    const oid='#AT-'+Date.now().toString().slice(-6);
+    const cid='C'+String(customers.length+1).padStart('3','0');
+    const nm=document.getElementById('sNm').value;
+    const ph=document.getElementById('sPh').value;
+    const ad=document.getElementById('sAd').value;
+    const em=document.getElementById('sEm').value;
+    const dt=document.getElementById('sDt').value;
+    const avatarColors=['#FF6B00','#2D7A3A','#1A6EFF','#C40099','#C47A00','#7B2FBE'];
+    // Add to customers
+    const newCust={
+      id:cid,name:nm,phone:ph,email:em,address:ad,
+      plan:curPlan,price:curPrice,status:'Active',startDate:dt,
+      payMethod:qMethod,avatar:nm.charAt(0).toUpperCase(),
+      color:avatarColors[customers.length%avatarColors.length],
+      joinDate:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+    };
+    customers.unshift(newCust);
+    // Add to payments
+    const newPay={
+      id:'PAY'+Date.now().toString().slice(-6),custId:cid,custName:nm,
+      plan:curPlan,amount:curPrice,method:qMethod,status:'Paid',
+      date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+    };
+    payments.unshift(newPay);
+    // Add to orders
+    const o={id:oid,plan:curPlan,price:curPrice,name:nm,address:ad,date:dt,pay:qMethod,status:'Active',time:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})};
+    orders.unshift(o);
+    saveData();
+    initRoutine();
+    document.getElementById('succOId').textContent=oid;
+    document.getElementById('displayOId').textContent=oid;
+    document.getElementById('succ').classList.add('active');
+  },2200);
+}
+
+// ===== CUSTOMERS =====
+let activeCustId=null;
+function setCustFilter(f,el){
+  custFilter=f;
+  document.querySelectorAll('#page-customers .itab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderCustomers();
+}
+
+function renderCustomers(){
+  updateCustStats();
+  const q=(document.getElementById('custSearch')?.value||'').toLowerCase();
+  let list=customers.filter(c=>{
+    const matchQ=!q||c.name.toLowerCase().includes(q)||c.phone.includes(q);
+    const matchF=custFilter==='all'||(c.status||'Active').toLowerCase()===custFilter;
+    return matchQ&&matchF;
+  });
+  const box=document.getElementById('custContainer');
+  const noEl=document.getElementById('noCust');
+  if(!list.length){box.innerHTML='';noEl.style.display='block';return;}
+  noEl.style.display='none';
+  box.innerHTML=list.map(c=>{
+    const planClass=c.plan==='Premium Plan'?'plan-premium':c.plan==='Standard Plan'?'plan-standard':'plan-basic';
+    const statusClass=c.status==='Active'?'status-active':c.status==='Paused'?'status-paused':'status-expired';
+    return `<div class="customer-card" onclick="viewCustomer('${c.id}')">
+      <div class="cust-row">
+        <div class="cust-avatar" style="background:${c.color||'#FF6B00'};">${c.avatar||c.name.charAt(0)}</div>
+        <div class="cust-info">
+          <div class="cust-name">${c.name}</div>
+          <div class="cust-phone">📞 ${c.phone}</div>
+          <div class="cust-meta">
+            <span class="cust-plan-badge ${planClass}">${c.plan}</span>
+            <span class="cust-status ${statusClass}">${c.status||'Active'}</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:15px;font-weight:900;color:var(--saffron);">₹${(c.price||0).toLocaleString()}</div>
+          <div style="font-size:9px;color:#bbb;">/month</div>
+          <div style="font-size:10px;color:#aaa;margin-top:4px;">${c.joinDate||''}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateCustStats(){
+  document.getElementById('statTotal').textContent=customers.length;
+  document.getElementById('statActive').textContent=customers.filter(c=>c.status==='Active').length;
+  const rev=customers.filter(c=>c.status==='Active').reduce((a,c)=>a+(c.price||0),0);
+  document.getElementById('statRevenue').textContent='₹'+rev.toLocaleString();
+}
+
+function viewCustomer(id){
+  activeCustId=id;
+  const c=customers.find(x=>x.id===id);
+  if(!c)return;
+  document.getElementById('custList').style.display='none';
+  document.getElementById('custDetail').style.display='block';
+  document.getElementById('detailBreadcrumb').textContent=c.name;
+  const planClass=c.plan==='Premium Plan'?'plan-premium':c.plan==='Standard Plan'?'plan-standard':'plan-basic';
+  document.getElementById('cdHeader').innerHTML=`
+    <div class="cd-avatar" style="background:rgba(255,255,255,0.25);">${c.avatar||c.name.charAt(0)}</div>
+    <div class="cd-name">${c.name}</div>
+    <div class="cd-phone">📞 ${c.phone}${c.email?'  ·  ✉️ '+c.email:''}</div>
+    <div class="cd-phone" style="margin-top:3px;font-size:11px;opacity:0.8;">📍 ${c.address}</div>
+    <div class="cd-badges">
+      <span class="cd-badge">${c.plan}</span>
+      <span class="cd-badge">${c.status||'Active'}</span>
+      <span class="cd-badge">💳 ${c.payMethod||'UPI'}</span>
+      <span class="cd-badge">Since ${c.joinDate||c.startDate}</span>
+    </div>`;
+  refreshCustDetail(id);
+}
+
+function refreshCustDetail(id){
+  const c=customers.find(x=>x.id===id);
+  if(!c)return;
+  const custPays=payments.filter(p=>p.custId===id);
+  const totalPaid=custPays.filter(p=>p.status==='Paid'&&p.type!=='deduct').reduce((a,p)=>a+p.amount,0);
+  const totalDeducted=custPays.filter(p=>p.type==='deduct').reduce((a,p)=>a+p.amount,0);
+  const totalPending=custPays.filter(p=>p.status==='Pending'&&p.type!=='deduct').reduce((a,p)=>a+p.amount,0);
+  const balance=totalPaid-totalDeducted;
+
+  document.getElementById('cdStats').innerHTML=`
+    <div class="cd-stat">
+      <div class="cd-stat-val" style="color:var(--green);">₹${totalPaid.toLocaleString()}</div>
+      <div class="cd-stat-lbl">Total Received</div>
+    </div>
+    <div class="cd-stat">
+      <div class="cd-stat-val" style="color:#C40000;">₹${totalDeducted.toLocaleString()}</div>
+      <div class="cd-stat-lbl">Deducted</div>
+    </div>
+    <div class="cd-stat">
+      <div class="cd-stat-val" style="color:${balance>=0?'var(--saffron)':'#C40000'};">₹${balance.toLocaleString()}</div>
+      <div class="cd-stat-lbl">Net Balance</div>
+    </div>`;
+
+  if(!custPays.length){
+    document.getElementById('cdPayments').innerHTML='<div class="empty-state"><div class="ei">💸</div><div class="et">No payments yet</div><div class="es">Use Add Payment to record a transaction</div></div>';
+    return;
+  }
+  document.getElementById('cdPayments').innerHTML=custPays.map(p=>{
+    const isDeduct=p.type==='deduct';
+    const ico=isDeduct?'➖':p.method==='UPI'?'📱':p.method==='Card'?'💳':p.method==='COD'?'💵':'🏦';
+    const icoBg=isDeduct?'#FFE8E8':p.method==='UPI'?'#E8F5EB':p.method==='Card'?'#EEF2FF':p.method==='COD'?'#FFFBEA':'#F3F0FF';
+    const stCls=isDeduct?'ps-failed':p.status==='Paid'?'ps-paid':'ps-pending';
+    const stLbl=isDeduct?'Deducted':p.status;
+    const amtColor=isDeduct?'#C40000':'var(--green)';
+    const amtSign=isDeduct?'−':'＋';
+    return `<div class="ph-item" style="position:relative;">
+      <div class="ph-ico" style="background:${icoBg};">${ico}</div>
+      <div class="ph-info">
+        <div class="ph-desc">${p.note||p.plan||'Payment'}</div>
+        <div class="ph-meta">${p.date} ${p.time||''} · ${isDeduct?'Deduction':p.method}</div>
+      </div>
+      <div class="ph-right">
+        <div class="ph-amt" style="color:${amtColor};">${amtSign}₹${(p.amount||0).toLocaleString()}</div>
+        <div class="ph-status ${stCls}">${stLbl}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showCustList(){
+  document.getElementById('custList').style.display='block';
+  document.getElementById('custDetail').style.display='none';
+  renderCustomers();
+}
+
+// ===== ADD / DEDUCT PAYMENT =====
+function openAddPayment(type){
+  const c=customers.find(x=>x.id===activeCustId);
+  if(!c)return;
+  const isDeduct=(type==='deduct');
+  const planPrice=c.price||0;
+  document.getElementById('addPayContent').innerHTML=`
+    <h2 style="font-family:'Playfair Display',serif;font-size:19px;margin-bottom:2px;">${isDeduct?'➖ Deduct / Refund':'➕ Add Payment'}</h2>
+    <p style="font-size:11px;color:#999;margin-bottom:14px;">${c.name} · ${c.plan}</p>
+    <div style="background:${isDeduct?'#FFF0F0':'#F0FFF5'};border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11px;color:#888;">Plan Amount</span>
+      <span style="font-size:16px;font-weight:900;color:${isDeduct?'#C40000':'var(--green)'};">₹${planPrice.toLocaleString()}</span>
+    </div>
+    <div class="fg">
+      <label>Amount (₹) *</label>
+      <input type="number" id="apAmt" placeholder="e.g. ${planPrice}" value="${planPrice}" min="1" style="font-size:16px;font-weight:800;" />
+    </div>
+    ${!isDeduct?`<div class="fg">
+      <label>Payment Method *</label>
+      <select id="apMethod">
+        <option value="UPI">📱 UPI (GPay/PhonePe/Paytm)</option>
+        <option value="Card">💳 Card</option>
+        <option value="COD">💵 Cash</option>
+        <option value="Net Banking">🏦 Net Banking</option>
+      </select>
+    </div>`:''}
+    <div class="fg">
+      <label>${isDeduct?'Reason for Deduction':'Payment Note'}</label>
+      <input type="text" id="apNote" placeholder="${isDeduct?'e.g. Refund, Extra charge deducted...':'e.g. Monthly fee, Advance payment...'}" />
+    </div>
+    <div class="fg">
+      <label>Date</label>
+      <input type="date" id="apDate" value="${new Date().toISOString().split('T')[0]}" />
+    </div>
+    ${!isDeduct?`<div class="fg">
+      <label>Status</label>
+      <select id="apStatus">
+        <option value="Paid">✅ Paid</option>
+        <option value="Pending">⏳ Pending</option>
+      </select>
+    </div>`:''}
+    <button class="btn ${isDeduct?'btn-p':'btn-g'}" style="${isDeduct?'background:linear-gradient(135deg,#C40000,#FF2222);':''}" onclick="saveAddPayment('${type}')">
+      ${isDeduct?'➖ Record Deduction':'➕ Record Payment'}
+    </button>`;
+  document.getElementById('addPayOvl').classList.add('active');
+}
+
+function saveAddPayment(type){
+  const c=customers.find(x=>x.id===activeCustId);
+  if(!c)return;
+  const isDeduct=(type==='deduct');
+  const amt=parseFloat(document.getElementById('apAmt').value);
+  if(!amt||amt<=0){alert('Please enter a valid amount!');return;}
+  const method=isDeduct?'Deduction':(document.getElementById('apMethod')?.value||'UPI');
+  const note=document.getElementById('apNote').value.trim()||( isDeduct?'Deduction':'Monthly Payment');
+  const dateVal=document.getElementById('apDate').value;
+  const status=isDeduct?'Deducted':(document.getElementById('apStatus')?.value||'Paid');
+  const dateStr=new Date(dateVal).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  const newPay={
+    id:'PAY'+Date.now().toString().slice(-7),
+    custId:c.id,
+    custName:c.name,
+    plan:c.plan,
+    amount:amt,
+    method:method,
+    status:isDeduct?'Paid':status,
+    type:isDeduct?'deduct':'credit',
+    note:note,
+    date:dateStr,
+    time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+  };
+  payments.unshift(newPay);
+  saveData();
+  document.getElementById('addPayOvl').classList.remove('active');
+  refreshCustDetail(activeCustId);
+  renderPayHistory();
+}
+
+// ===== ADD CUSTOMER =====
+function openAddCustomer(){
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('acSt').value=today;
+  document.getElementById('acSt').min=today;
+  document.getElementById('addCustOvl').classList.add('active');
+}
+function saveCustomer(){
+  const nm=document.getElementById('acNm').value.trim();
+  const ph=document.getElementById('acPh').value.trim();
+  const ad=document.getElementById('acAd').value.trim();
+  if(!nm||!ph||!ad){alert('Please fill Name, Phone & Address!');return;}
+  const plan=document.getElementById('acPlan').value;
+  const price=plan==='Premium Plan'?2500:plan==='Standard Plan'?2000:1500;
+  const avatarColors=['#FF6B00','#2D7A3A','#1A6EFF','#C40099','#C47A00','#7B2FBE'];
+  const cid='C'+String(Date.now()).slice(-5);
+  const newCust={
+    id:cid,name:nm,phone:ph,email:document.getElementById('acEm').value,
+    address:ad,plan:plan,price:price,
+    status:document.getElementById('acStatus').value,
+    startDate:document.getElementById('acSt').value,
+    payMethod:document.getElementById('acPay').value,
+    avatar:nm.charAt(0).toUpperCase(),
+    color:avatarColors[customers.length%avatarColors.length],
+    joinDate:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+  };
+  customers.unshift(newCust);
+  // also create a payment record
+  const newPay={
+    id:'PAY'+Date.now().toString().slice(-6),custId:cid,custName:nm,
+    plan:plan,amount:price,method:newCust.payMethod,status:'Pending',
+    date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+    time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+  };
+  payments.unshift(newPay);
+  saveData();
+  document.getElementById('addCustOvl').classList.remove('active');
+  ['acNm','acPh','acEm','acAd'].forEach(id=>{document.getElementById(id).value='';});
+  initRoutine();
+  renderCustomers();
+  alert('✅ Customer added successfully!');
+}
+
+// ===== PAYMENT HISTORY =====
+function setPhFilter(f,el){
+  phFilter=f;
+  document.querySelectorAll('.ph-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderPayHistory();
+}
+
+function renderPhItem(p){
+  const ico=p.method==='UPI'?'📱':p.method==='Card'?'💳':p.method==='COD'?'💵':'🏦';
+  const icoBg=p.method==='UPI'?'#E8F5EB':p.method==='Card'?'#EEF2FF':p.method==='COD'?'#FFFBEA':'#F3F0FF';
+  const stCls=p.status==='Paid'?'ps-paid':p.status==='Pending'?'ps-pending':'ps-failed';
+  return `<div class="ph-item">
+    <div class="ph-ico" style="background:${icoBg};">${ico}</div>
+    <div class="ph-info">
+      <div class="ph-desc">${p.custName||'Unknown'}</div>
+      <div class="ph-meta">${p.plan} · ${p.date} ${p.time||''} · ${p.id}</div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-amt credit">₹${(p.amount||0).toLocaleString()}</div>
+      <div class="ph-status ${stCls}">${p.status}</div>
+    </div>
+  </div>`;
+}
+
+function renderPayHistory(){
+  // Update stats
+  const paid=payments.filter(p=>p.status==='Paid');
+  const pending=payments.filter(p=>p.status==='Pending');
+  const totalAmt=paid.reduce((a,p)=>a+p.amount,0);
+  document.getElementById('phTotal').textContent='₹'+totalAmt.toLocaleString();
+  document.getElementById('phPaid').textContent=paid.length;
+  document.getElementById('phPending').textContent=pending.length;
+
+  let list=payments;
+  if(phFilter==='paid')list=payments.filter(p=>p.status==='Paid');
+  else if(phFilter==='pending')list=payments.filter(p=>p.status==='Pending');
+  else if(phFilter==='upi')list=payments.filter(p=>p.method==='UPI');
+  else if(phFilter==='card')list=payments.filter(p=>p.method==='Card');
+  else if(phFilter==='cod')list=payments.filter(p=>p.method==='COD');
+
+  const box=document.getElementById('phContainer');
+  const noEl=document.getElementById('noPH');
+  if(!list.length){box.innerHTML='';noEl.style.display='block';return;}
+  noEl.style.display='none';
+  box.innerHTML=list.map(p=>renderPhItem(p)).join('');
+}
+
+// ===== ORDERS =====
+function renderOrders(){
+  const box=document.getElementById('ordersBox'),no=document.getElementById('noOrd');
+  if(!orders.length){box.innerHTML='';no.style.display='block';return;}
+  no.style.display='none';
+  box.innerHTML=orders.map(o=>`
+    <div style="background:white;border-radius:15px;padding:15px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid var(--saffron);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:800;">${o.id}</div>
+        <div style="background:var(--lgreen);color:var(--green);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;">${o.status}</div>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:3px;">${o.plan}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:7px;">📦 4 Roti + 2 Sabzi + Chaval · 30 Days</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="background:var(--cream);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">📅 ${o.date}</span>
+        <span style="background:var(--cream);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">💳 ${o.pay}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #F0EAE2;padding-top:8px;">
+        <div style="font-size:10px;color:#bbb;">${o.time}</div>
+        <div style="font-size:17px;font-weight:900;color:var(--saffron);">₹${parseInt(o.price).toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ===== PLAN / PAY SELECTORS =====
+function selPlan(n,price,name){
+  for(let i=1;i<=3;i++){document.getElementById('pp'+i).classList.remove('sel');document.getElementById('pr'+i).classList.remove('sel');}
+  document.getElementById('pp'+n).classList.add('sel');document.getElementById('pr'+n).classList.add('sel');
+  document.getElementById('payPN').textContent=name;document.getElementById('payTot').textContent='₹'+price.toLocaleString();
+  document.getElementById('payBtnA').textContent='₹'+price.toLocaleString();
+}
+function selMethod(m){
+  ['UPI','Card','COD','Net'].forEach(x=>{
+    const el=document.getElementById('m'+x);const r=document.getElementById('r'+x);
+    if(el)el.classList.remove('sel');if(r)r.classList.remove('sel');
+  });
+  document.getElementById('m'+m).classList.add('sel');document.getElementById('r'+m).classList.add('sel');
+  document.getElementById('upiWrap').style.display='none';
+  document.getElementById('cardWrap').style.display='none';
+  document.getElementById('codNote').style.display='none';
+  document.getElementById('netWrap').style.display='none';
+  if(m==='UPI')document.getElementById('upiWrap').style.display='block';
+  else if(m==='Card')document.getElementById('cardWrap').style.display='block';
+  else if(m==='COD')document.getElementById('codNote').style.display='block';
+  else if(m==='Net')document.getElementById('netWrap').style.display='block';
+}
+function selUPI(app,el){
+  document.querySelectorAll('#page-payment .tag').forEach(t=>{t.style.background='var(--cream)';t.style.color='#888';t.style.borderColor='#EDE8E2';});
+  el.style.background='#FFF3EC';el.style.color='var(--saffron)';el.style.borderColor='var(--saffron)';
+}
+function doPayment(){alert('✅ Payment flow initiated!\n\n(Demo: In a real app this redirects to a payment gateway)');}
+function fmtCard(el){let v=el.value.replace(/\D/g,'').substring(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();}
+function fmtExp(el){let v=el.value.replace(/\D/g,'').substring(0,4);if(v.length>=3)v=v.substring(0,2)+'/'+v.substring(2);el.value=v;}
+
+// ===== TRACK =====
+function copyOId(){const id=document.getElementById('displayOId').textContent;navigator.clipboard?.writeText(id).catch(()=>{});const b=document.querySelector('.copy-btn');b.textContent='✅ Copied!';setTimeout(()=>b.textContent='📋 Copy',2000);}
+function refreshTrack(btn){btn.textContent='⏳ Updating...';btn.disabled=true;setTimeout(()=>{btn.textContent='🔄 Refresh Status';btn.disabled=false;alert('✅ Status refreshed!\n🛵 12 mins away.');},1500);}
+
+// ===== DELIVERY ROUTINE — LUNCH & DINNER =====
+// Two sessions per day: lunch (9AM–12PM) and dinner (7PM–9PM)
+// Each customer gets one delivery per session
+
+let drFilter = 'all';
+let activeMealSession = 'lunch'; // 'lunch' or 'dinner'
+
+const STATUS_ORDER  = ['pending','cooking','packed','transit','delivered'];
+const STATUS_LABELS = {pending:'Pending',cooking:'Cooking',packed:'Packed',transit:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'};
+const STATUS_ICONS  = {pending:'⏳',cooking:'👨‍🍳',packed:'📦',transit:'🛵',delivered:'✅',cancelled:'❌'};
+const STATUS_BADGE  = {pending:'dsb-pending',cooking:'dsb-cooking',packed:'dsb-packed',transit:'dsb-transit',delivered:'dsb-delivered',cancelled:'dsb-cancelled'};
+const STATUS_CARD   = {pending:'st-pending',cooking:'st-cooking',packed:'st-packed',transit:'st-transit',delivered:'st-delivered',cancelled:'st-cancelled'};
+
+// ── LUNCH: 9:00 AM cooking starts, deliver by 12:00 PM
+// ── DINNER: 7:00 PM cooking starts, deliver by 9:00 PM
+const SESSION_CONFIG = {
+  lunch: {
+    label:'Lunch',icon:'☀️',color:'#F5A623',bg:'#FFF3DC',
+    start:9, end:12,          // ☀️ Lunch: 9:00 AM – 12:00 PM
+    slots:{
+      'Premium Plan': {cook:'09:00',pack:'09:30',dispatch:'10:00',deliver:'10:30'},
+      'Standard Plan':{cook:'09:30',pack:'10:00',dispatch:'10:30',deliver:'11:00'},
+      'Basic Plan':   {cook:'10:00',pack:'10:30',dispatch:'11:00',deliver:'11:30'}
+    }
+  },
+  dinner:{
+    label:'Dinner',icon:'🌙',color:'#1A6EFF',bg:'#E8F0FF',
+    start:19, end:21,         // 🌙 Dinner: 7:00 PM – 9:00 PM
+    slots:{
+      'Premium Plan': {cook:'19:00',pack:'19:20',dispatch:'19:40',deliver:'20:00'},
+      'Standard Plan':{cook:'19:15',pack:'19:35',dispatch:'19:55',deliver:'20:20'},
+      'Basic Plan':   {cook:'19:30',pack:'19:50',dispatch:'20:10',deliver:'20:40'}
+    }
+  }
+};
+
+// routine stored as: { lunch:{C001:{status,manualOverride,deliveredAt},...}, dinner:{...} }
+let routineData = {lunch:{}, dinner:{}};
+
+function timeToMins(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function nowMins(){const n=new Date();return n.getHours()*60+n.getMinutes();}
+function nowH(){return new Date().getHours();}
+function fmtTime(t){
+  const[h,m]=t.split(':').map(Number);
+  const ap=h>=12?'PM':'AM';const hh=h%12||12;
+  return hh+':'+(m<10?'0':'')+m+' '+ap;
+}
+
+function autoStatusForSession(cust, session){
+  const cfg=SESSION_CONFIG[session];
+  const slots=cfg.slots[cust.plan]||cfg.slots['Basic Plan'];
+  const now=nowMins();
+  // Before session window → pending
+  if(now < timeToMins(slots.cook)) return 'pending';
+  if(now >= timeToMins(slots.deliver)) return 'delivered';
+  if(now >= timeToMins(slots.dispatch)) return 'transit';
+  if(now >= timeToMins(slots.pack))    return 'packed';
+  return 'cooking';
+}
+
+function loadRoutineData(){
+  const key='routine2_'+new Date().toISOString().split('T')[0];
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||'null');
+    if(saved){routineData=saved;}
+  }catch(e){}
+}
+
+function saveRoutineData(){
+  const key='routine2_'+new Date().toISOString().split('T')[0];
+  try{localStorage.setItem(key,JSON.stringify(routineData));}catch(e){}
+}
+
+function initRoutine(){
+  loadRoutineData();
+  const activeCusts=customers.filter(c=>c.status==='Active');
+  ['lunch','dinner'].forEach(session=>{
+    activeCusts.forEach(c=>{
+      if(!routineData[session]) routineData[session]={};
+      if(!routineData[session][c.id]){
+        // First time — auto-set based on time
+        routineData[session][c.id]={
+          status: autoStatusForSession(c,session),
+          manualOverride:false,
+          deliveredAt:null
+        };
+      } else if(!routineData[session][c.id].manualOverride){
+        // Auto-advance if not manually overridden
+        routineData[session][c.id].status=autoStatusForSession(c,session);
+      }
+    });
+  });
+  saveRoutineData();
+}
+
+function setMealSession(s){
+  activeMealSession=s;
+  document.getElementById('stLunch').classList.toggle('active',s==='lunch');
+  document.getElementById('stDinner').classList.toggle('active',s==='dinner');
+  // Reset filter to all when switching
+  drFilter='all';
+  document.querySelectorAll('.dr-chip').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('.dr-chip')[0]?.classList.add('on');
+  renderRoutine();
+}
+
+function advanceStatus(custId){
+  const session=activeMealSession;
+  if(!routineData[session][custId]) return;
+  const dr=routineData[session][custId];
+  const idx=STATUS_ORDER.indexOf(dr.status);
+  if(idx < STATUS_ORDER.length-1){
+    dr.status=STATUS_ORDER[idx+1];
+    dr.manualOverride=true;
+    if(dr.status==='delivered')
+      dr.deliveredAt=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  }
+  saveRoutineData();
+  renderRoutine();
+  renderDashboard();
+}
+
+function cancelOrder(custId){
+  const session=activeMealSession;
+  const c=customers.find(x=>x.id===custId);
+  if(!c)return;
+  const sessionLabel=session==='lunch'?'Lunch (☀️)':'Dinner (🌙)';
+  if(!confirm('Cancel today\'s '+sessionLabel+' order for '+c.name+'?\n\nTheir subscription stays active — only today\'s delivery is cancelled.')) return;
+  if(!routineData[session]) routineData[session]={};
+  routineData[session][custId]={
+    status:'cancelled',
+    manualOverride:true,
+    deliveredAt:null,
+    cancelledAt:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+  };
+  saveRoutineData();
+  renderRoutine();
+  renderDashboard();
+}
+
+function restoreOrder(custId){
+  const session=activeMealSession;
+  const c=customers.find(x=>x.id===custId);
+  if(!c)return;
+  if(!confirm('Restore today\'s order for '+c.name+'?')) return;
+  const autoSt=autoStatusForSession(c,session);
+  routineData[session][custId]={status:autoSt,manualOverride:false,deliveredAt:null,cancelledAt:null};
+  saveRoutineData();
+  renderRoutine();
+  renderDashboard();
+}
+
+function setDrFilter(f,el){
+  drFilter=f;
+  document.querySelectorAll('.dr-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderRoutine();
+}
+
+function resetSession(){
+  if(!confirm('Reset '+activeMealSession+' deliveries to Pending?')) return;
+  const session=activeMealSession;
+  Object.keys(routineData[session]||{}).forEach(id=>{
+    routineData[session][id]={status:'pending',manualOverride:false,deliveredAt:null};
+  });
+  saveRoutineData();
+  renderRoutine();
+}
+
+function renderRoutine(){
+  initRoutine();
+  updateDrClock();
+
+  const session=activeMealSession;
+  const cfg=SESSION_CONFIG[session];
+  const activeCusts=customers.filter(c=>c.status==='Active');
+  const sessionMap=routineData[session]||{};
+
+  // Overall stats across both sessions for header pills
+  const allLunch=Object.values(routineData.lunch||{});
+  const allDinner=Object.values(routineData.dinner||{});
+  const allItems=[...allLunch,...allDinner];
+  const totalAll=allItems.filter(d=>d.status!=='cancelled').length;
+  const doneAll=allItems.filter(d=>d.status==='delivered').length;
+  const transitAll=allItems.filter(d=>d.status==='transit').length;
+  const pendAll=allItems.filter(d=>['pending','cooking','packed'].includes(d.status)).length;
+  const cancelledAll=allItems.filter(d=>d.status==='cancelled').length;
+  const pctAll=totalAll>0?Math.round((doneAll/totalAll)*100):0;
+
+  document.getElementById('drProgressText').textContent=doneAll+' / '+totalAll+' delivered today';
+  document.getElementById('drProgressFill').style.width=pctAll+'%';
+  document.getElementById('drSessionLabel').textContent='Today — Lunch + Dinner';
+  document.getElementById('pillPending').textContent=pendAll;
+  document.getElementById('pillTransit').textContent=transitAll;
+  document.getElementById('pillDone').textContent=doneAll;
+  document.getElementById('pillCancelled').textContent=cancelledAll;
+
+  // Session banner
+  const h=nowH();
+  const isActive=(h>=cfg.start && h<cfg.end);
+  const isDone=h>=cfg.end;
+  const banner=document.getElementById('sessionBanner');
+  const badge=document.getElementById('sbBadge');
+  document.getElementById('sbIco').textContent=cfg.icon;
+  document.getElementById('sbTitle').textContent=cfg.label+' Delivery Session';
+  document.getElementById('sbDesc').textContent=
+    cfg.icon+' '+fmtTime(cfg.start+':00')+' – '+fmtTime(cfg.end+':00')+'  ·  '+activeCusts.length+' tiffins';
+  if(isActive){
+    banner.className='session-banner '+(session==='lunch'?'lunch-active':'dinner-active');
+    badge.className='sb-badge live'; badge.textContent='🟢 LIVE NOW';
+  } else if(isDone){
+    banner.className='session-banner session-done';
+    badge.className='sb-badge done'; badge.textContent='✅ Completed';
+  } else {
+    banner.className='session-banner session-waiting';
+    badge.className='sb-badge wait';
+    badge.textContent=h<cfg.start?'⏰ Starts '+fmtTime(cfg.start+':00'):'⏰ Done';
+  }
+
+  // Session summary boxes
+  const sessDone=Object.values(sessionMap).filter(d=>d.status==='delivered').length;
+  const sessTotal=activeCusts.length;
+  const sessTransit=Object.values(sessionMap).filter(d=>d.status==='transit').length;
+  const sessPend=Object.values(sessionMap).filter(d=>['pending','cooking','packed'].includes(d.status)).length;
+  document.getElementById('sessionSummary').innerHTML=`
+    <div class="mss-box">
+      <div class="mss-ico">${cfg.icon}</div>
+      <div class="mss-count" style="color:${cfg.color};">${sessDone}/${sessTotal}</div>
+      <div class="mss-lbl">${cfg.label} Delivered</div>
+      <div class="mss-time" style="background:${cfg.bg};color:${cfg.color};">${fmtTime(cfg.start+':00')}–${fmtTime(cfg.end+':00')}</div>
+    </div>
+    <div class="mss-box">
+      <div class="mss-ico">🛵</div>
+      <div class="mss-count" style="color:var(--saffron);">${sessTransit}</div>
+      <div class="mss-lbl">Out for Delivery</div>
+      <div class="mss-time" style="background:#FFF3EC;color:var(--saffron);">${sessPend} still pending</div>
+    </div>`;
+
+  // Auto-start desc
+  document.getElementById('autoStartDesc').textContent=
+    session==='lunch'
+      ? (h>=9?'Lunch auto-started 9:00 AM · '+sessDone+'/'+sessTotal+' done':'Lunch starts at 9:00 AM · '+sessTotal+' scheduled')
+      : (h>=19?'Dinner auto-started 7:00 PM · '+sessDone+'/'+sessTotal+' done':'Dinner starts at 7:00 PM · '+sessTotal+' scheduled');
+
+  // Build delivery list for current session
+  let list=activeCusts.map(c=>({cust:c, dr:sessionMap[c.id]||{status:'pending',manualOverride:false,deliveredAt:null}}));
+  if(drFilter!=='all') list=list.filter(({dr})=>dr.status===drFilter);
+
+  const container=document.getElementById('drList');
+  if(!list.length){
+    container.innerHTML=`<div class="empty-state"><div class="ei">🛵</div><div class="et">No deliveries</div><div class="es">Try a different filter</div></div>`;
+    return;
+  }
+
+  const slots_cfg=cfg.slots;
+  container.innerHTML=list.map(({cust:c, dr})=>{
+    const isCancelled=dr.status==='cancelled';
+    const slots=slots_cfg[c.plan]||slots_cfg['Basic Plan'];
+    const stepsDone=isCancelled?-1:STATUS_ORDER.indexOf(dr.status);
+    const nextStatus=STATUS_ORDER[Math.min(STATUS_ORDER.indexOf(dr.status)+1,4)];
+    const isLast=dr.status==='delivered';
+    const planClass=c.plan==='Premium Plan'?'plan-premium':c.plan==='Standard Plan'?'plan-standard':'plan-basic';
+    const stepHtml=STATUS_ORDER.map((s,i)=>{
+      const cls=isCancelled?'':i<stepsDone?'done':i===stepsDone&&!isLast?'active-step':'';
+      return `<div class="dr-step-mini ${cls}"></div>`;
+    }).join('');
+
+    return `<div class="dr-card ${STATUS_CARD[dr.status]||'st-pending'}">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px;">
+        <div style="font-size:12px;font-weight:700;padding:2px 9px;border-radius:20px;background:${isCancelled?'#FFE8E8':cfg.bg};color:${isCancelled?'#C40000':cfg.color};">${isCancelled?'❌ Cancelled':cfg.icon+' '+cfg.label}</div>
+        <div style="font-size:10px;color:#bbb;">${fmtTime(slots.cook)} → ${fmtTime(slots.deliver)}</div>
+      </div>
+      <div class="dr-card-top">
+        <div class="dr-cust-avatar" style="background:${isCancelled?'#aaa':(c.color||'#FF6B00')};opacity:${isCancelled?'0.6':'1'};">${c.avatar||c.name.charAt(0)}</div>
+        <div class="dr-cust-info">
+          <div class="dr-cust-name" style="${isCancelled?'text-decoration:line-through;color:#aaa;':''}">${c.name}</div>
+          <div class="dr-cust-addr">📍 ${c.address}</div>
+        </div>
+        <div class="dr-status-badge ${STATUS_BADGE[dr.status]||'dsb-pending'}">${STATUS_ICONS[dr.status]||'⏳'} ${STATUS_LABELS[dr.status]||'Pending'}</div>
+      </div>
+      ${isCancelled
+        ? `<div style="background:#FFE8E8;border-radius:10px;padding:10px 12px;margin-bottom:10px;text-align:center;">
+             <div style="font-size:13px;font-weight:800;color:#C40000;">❌ Today's order cancelled</div>
+             <div style="font-size:10px;color:#E08080;margin-top:2px;">Cancelled at ${dr.cancelledAt||'--:--'} · Subscription still active</div>
+           </div>`
+        : `<div class="dr-steps-mini">${stepHtml}</div>
+           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px;">
+             ${[{lbl:'Cook',time:slots.cook,s:'cooking'},{lbl:'Pack',time:slots.pack,s:'packed'},{lbl:'Dispatch',time:slots.dispatch,s:'transit'},{lbl:'Deliver',time:slots.deliver,s:'delivered'}].map(step=>{
+               const d2=STATUS_ORDER.indexOf(dr.status)>=STATUS_ORDER.indexOf(step.s);
+               return `<div style="text-align:center;padding:5px 2px;border-radius:8px;background:${d2?'var(--lgreen)':'#F5F5F5'};">
+                 <div style="font-size:11px;">${d2?'✅':'⭕'}</div>
+                 <div style="font-size:9px;font-weight:700;color:${d2?'var(--green)':'#bbb'};">${step.lbl}</div>
+                 <div style="font-size:9px;color:${d2?'var(--green)':'#ccc'};">${fmtTime(step.time)}</div>
+               </div>`;
+             }).join('')}
+           </div>`
+      }
+      <div class="dr-card-bottom">
+        <div>
+          <span class="dr-plan-tag ${planClass}">${c.plan.replace(' Plan','')}</span>
+          <div class="dr-meal-info" style="margin-top:3px;">🫓×${c.plan==='Basic Plan'?2:4} · 🥘×2 · 🍚×1 · 📞 ${c.phone}</div>
+          ${dr.deliveredAt?`<div style="font-size:10px;color:var(--green);font-weight:700;margin-top:2px;">✅ Delivered at ${dr.deliveredAt}</div>`:''}
+        </div>
+        <div class="dr-actions">
+          ${isCancelled
+            ?`<button class="dr-btn dr-btn-restore" onclick="restoreOrder('${c.id}')">↺ Restore</button>`
+            :isLast
+              ?`<div class="dr-btn dr-btn-done">✅ Done!</div>`
+              :`<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
+                  <button class="dr-btn dr-btn-next" onclick="advanceStatus('${c.id}')">${STATUS_ICONS[nextStatus]} ${STATUS_LABELS[nextStatus]}</button>
+                  <button class="dr-btn dr-btn-cancel" onclick="cancelOrder('${c.id}')">❌ Cancel Today</button>
+                </div>`
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateDrClock(){
+  const now=new Date();
+  const el=document.getElementById('drClock');
+  const de=document.getElementById('drDate');
+  if(el) el.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  if(de) de.textContent=now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+}
+
+// Auto-advance every 60s; also auto-switch to dinner tab when evening
+setInterval(()=>{
+  initRoutine();
+  updateDrClock();
+  // Auto-switch active tab based on time
+  const h=nowH();
+  if(h>=19 && h<21 && activeMealSession==='lunch'){
+    setMealSession('dinner');
+  }
+  if(document.getElementById('page-routine')?.classList.contains('active')){
+    renderRoutine();
+  }
+},60000);
+
+
+function renderDashboard(){
+  // Clock
+  updateClock();
+
+  const active=customers.filter(c=>c.status==='Active');
+  const premium=active.filter(c=>c.plan==='Premium Plan').length;
+  const standard=active.filter(c=>c.plan==='Standard Plan').length;
+  const basic=active.filter(c=>c.plan==='Basic Plan').length;
+  const total=premium+standard+basic;
+
+  // Meal counts
+  document.getElementById('mc-premium').textContent=premium;
+  document.getElementById('mc-standard').textContent=standard;
+  document.getElementById('mc-basic').textContent=basic;
+  document.getElementById('mc-total').textContent=total;
+
+  // Animate numbers
+  animCount('mc-premium',premium);
+  animCount('mc-standard',standard);
+  animCount('mc-basic',basic);
+  animCount('mc-total',total);
+
+  // Kitchen prep — Basic Plan gets 2 rotis, others get 4
+  const rotis=(premium*4)+(standard*4)+(basic*2);
+  const sabzi=total*2;
+  const rice=total;
+  animCount('prep-roti',rotis);
+  animCount('prep-sabzi',sabzi);
+  animCount('prep-rice',rice);
+  animCount('prep-boxes',total);
+
+  // Alert banner
+  const alertEl=document.getElementById('dashAlert');
+  if(total===0){
+    alertEl.className='alert-band warn';
+    document.getElementById('alertTitle').textContent='No active subscriptions today';
+    document.getElementById('alertDesc').textContent='Add customers to see meal count';
+  } else if(total<5){
+    alertEl.className='alert-band info';
+    document.getElementById('alertTitle').textContent=total+' tiffins to prepare today';
+    document.getElementById('alertDesc').textContent='Kitchen prep starts at 10:00 AM';
+  } else {
+    alertEl.className='alert-band success';
+    document.getElementById('alertTitle').textContent='🎉 '+total+' tiffins confirmed for today!';
+    document.getElementById('alertDesc').textContent='All '+total+' customers active · Kitchen is ready';
+  }
+
+  // Delivery status (simulated: 60% delivered, 20% transit, 20% pending)
+  const done=Math.floor(total*0.6);
+  const transit=Math.floor(total*0.2);
+  const pend=total-done-transit;
+  animCount('del-done',done);
+  animCount('del-transit',transit);
+  animCount('del-pending',pend);
+  const pct=total>0?Math.round((done/total)*100):0;
+  setTimeout(()=>{
+    document.getElementById('delProgressBar').style.width=pct+'%';
+    document.getElementById('delPct').textContent=pct+'% completed';
+  },300);
+
+  // Revenue
+  const collected=active.filter(c=>c.plan==='Premium Plan').length*2500+
+                   active.filter(c=>c.plan==='Standard Plan').length*2000+
+                   active.filter(c=>c.plan==='Basic Plan').length*1500;
+  const pendingRev=customers.filter(c=>c.status==='Paused').reduce((a,c)=>a+(c.price||0),0);
+  document.getElementById('rev-collected').textContent='₹'+collected.toLocaleString();
+  document.getElementById('rev-pending').textContent='₹'+pendingRev.toLocaleString();
+  document.getElementById('rev-monthly').textContent='₹'+collected.toLocaleString();
+
+  // Plan distribution bars
+  const planData=[
+    {label:'👑 Premium',count:premium,color:'#C47A00',bg:'#FFF3DC',total:total},
+    {label:'🌟 Standard',count:standard,color:'#C45000',bg:'#FFE8D6',total:total},
+    {label:'🌿 Basic',count:basic,color:var_green,bg:'#E8F5EB',total:total}
+  ];
+  document.getElementById('planBars').innerHTML=planData.map(p=>{
+    const pct=p.total>0?Math.round((p.count/p.total)*100):0;
+    return `<div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <span style="font-size:12px;font-weight:700;">${p.label}</span>
+        <span style="font-size:13px;font-weight:900;color:${p.color};">${p.count} tiffins</span>
+      </div>
+      <div style="background:#F0EAE2;border-radius:20px;height:10px;overflow:hidden;">
+        <div class="plan-bar-fill" style="height:100%;background:${p.color};border-radius:20px;width:0%;transition:width 0.8s ease;" data-width="${pct}%"></div>
+      </div>
+      <div style="font-size:10px;color:#bbb;text-align:right;margin-top:2px;">${pct}%</div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>{
+    document.querySelectorAll('.plan-bar-fill').forEach(el=>{el.style.width=el.dataset.width;});
+  },300);
+
+  // Hourly delivery chart
+  const slots=['10AM','11AM','12PM','1PM','2PM','3PM'];
+  const now=new Date().getHours();
+  const slotHours=[10,11,12,13,14,15];
+  const maxH=Math.max(1,Math.ceil(total/slots.length));
+  document.getElementById('hourBars').innerHTML=slots.map((s,i)=>{
+    const h=slotHours[i];
+    const count=Math.max(1,Math.round(total/slots.length+(i%2===0?1:-1)));
+    const pct=Math.round((count/maxH)*100);
+    const cls=h<now?'past-slot':h===now?'active-slot':'future-slot';
+    return `<div class="hbar-wrap">
+      <div style="font-size:10px;color:${h===now?'var(--saffron)':'#aaa'};font-weight:${h===now?'800':'600'};margin-bottom:3px;">${count}</div>
+      <div class="hbar ${cls}" style="height:${total>0?pct:10}%;"></div>
+      <div class="hbar-lbl" style="color:${h===now?'var(--saffron)':'#ccc'};">${s}</div>
+    </div>`;
+  }).join('');
+
+  // Recent activity
+  const acts=[];
+  customers.slice(0,3).forEach(c=>{
+    acts.push({ico:c.avatar,color:c.color,title:c.name+' · '+c.plan,time:'Joined '+c.joinDate,badge:c.status,badgeCls:c.status==='Active'?'status-active':c.status==='Paused'?'status-paused':'status-expired'});
+  });
+  payments.slice(0,3).forEach(p=>{
+    acts.push({ico:'💳',color:'#1A6EFF',title:'₹'+p.amount+' from '+p.custName,time:p.date+' · '+p.method,badge:p.status,badgeCls:p.status==='Paid'?'ps-paid':'ps-pending'});
+  });
+  const recentEl=document.getElementById('recentActivity');
+  if(!acts.length){recentEl.innerHTML='<div style="text-align:center;padding:20px;color:#ccc;font-size:12px;">No recent activity</div>';return;}
+  recentEl.innerHTML=acts.slice(0,5).map(a=>`
+    <div class="activity-item">
+      <div class="act-dot" style="background:${a.color}20;color:${a.color};font-size:15px;font-weight:800;">${a.ico}</div>
+      <div class="act-info"><div class="act-title">${a.title}</div><div class="act-time">${a.time}</div></div>
+      <div class="act-badge ${a.badgeCls}">${a.badge}</div>
+    </div>`).join('');
+}
+
+const var_green='#2D7A3A';
+
+function animCount(id,target){
+  const el=document.getElementById(id);
+  if(!el)return;
+  let cur=0;const step=Math.max(1,Math.ceil(target/20));
+  const timer=setInterval(()=>{
+    cur=Math.min(cur+step,target);
+    el.textContent=cur;
+    if(cur>=target)clearInterval(timer);
+  },30);
+}
+
+function updateClock(){
+  const now=new Date();
+  document.getElementById('dashDay').textContent=now.getDate();
+  document.getElementById('dashDate').textContent=now.toLocaleDateString('en-IN',{month:'short',year:'numeric'});
+  document.getElementById('dashTime').textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(()=>{
+  updateClock();
+  if(document.getElementById('page-dashboard').classList.contains('active'))renderDashboard();
+},30000);
+setInterval(updateClock,1000);
+localStorage.clear();
+loadData();
+document.getElementById('upiWrap').style.display='block';
+if(new Date().getHours()>=19 && new Date().getHours()<21) activeMealSession='dinner';
+initRoutine();
+renderDashboard();
+
+// ===== PWA SETUP =====
+// Register real service worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// PWA Install prompt
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  document.getElementById('installBanner').style.display='flex';
+});
+document.getElementById('installBtn').addEventListener('click',async()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const result=await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    document.getElementById('installBanner').style.display='none';
+  } else {
+    // iOS instructions
+    alert('📱 To install on iPhone/iPad:\n\n1. Tap the Share button (□↑)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm\n\n✅ Asan Tiffin will appear as an app!');
+  }
+});
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('installBanner').style.display='none';
+});
+
+// Haptic feedback on button taps (where supported)
+document.addEventListener('click',e=>{
+  if(e.target.closest('.btn,.nt,.dr-btn,.dr-chip,.itab,.ph-chip')){
+    if(navigator.vibrate) navigator.vibrate(10);
+  }
+});
+
+// Prevent pull-to-refresh on mobile
+document.getElementById('pageArea').addEventListener('touchstart',e=>{
+  if(e.touches[0].clientY<=0) e.preventDefault();
+},{passive:false});
+</script>
+</body>
+</html>
